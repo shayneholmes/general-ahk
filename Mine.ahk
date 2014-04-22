@@ -18,7 +18,12 @@ SetTitleMatchMode 2 ; for #ifwinnotactive calls
 DetectHiddenWindows, on ; for minimized MM
 Menu, Tray, Icon, icon.ico
 
+#Include lib
 #Include minimizetray.ahk
+#Include MusicBeeIPC ; the path to the MusicBeeIPC SDK
+#Include MusicBeeIPC.ahk
+
+DetectHiddenWindows, On
 
 ^/::
 ^?::
@@ -168,6 +173,9 @@ $F7::Send ^+2
 if (SendToMM(0, 0x400, 104) == 1) { ; 0x400 is WM_USER, 104 is IPC_ISPLAYING
   SendToMM(40046) ; pause
 }
+if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
+  MB_PlayPause()
+}
 Sleep, 200 ; wait for Win key to lift
 DllCall("LockWorkStation")
 Sleep, 200
@@ -263,6 +271,50 @@ SendToMM(wParam, msg = 0x111, lParam = 0)
 
 #IfWinExist
 
+; Remappings for MusicBee
+#IfWinExist MusicBee
+
+Pause::Send {Media_Play_Pause}
+Pause & ScrollLock::Send {Media_Next}
+Pause & PrintScreen::Send {Media_Prev}
+
+F22::
+Media_Play_Pause::
+bMB_PlayPause()
+return
+
+F20::
+Media_Next::
+MB_NextTrack()
+return
+
+F21::
+Media_Prev::
+MB_PreviousTrack()
+return
+
+^!Right:: ; fast forward 15 secs
+MB_SetPosition(MB_GetPosition() + 15000)
+Return
+
+^!Left:: ; rewind 5 secs
+
+time := (MB_GetPosition() - 5000)
+if (time < 0)
+  time := 0
+MB_SetPosition(time)
+Return
+
+^!Up:: ; increase volume
+MB_SetVolume(MB_GetVolume()+10)
+Return
+
+^!Down:: ; decrease volume
+MB_SetVolume(MB_GetVolume()-10)
+Return
+
+#IfWinExist
+
 /**
  * Alt-tab combos (with JoyToKey)
  */
@@ -318,6 +370,9 @@ return
 Send {Printscreen}
 PlaceTooltip("Took screenshot.")
 return
+
+; edit script
+#^e::Run, notepad.exe %A_ScriptFullPath%
 
 ; Save and reload ahk if currently editing
 #ifwinactive Mine
@@ -390,6 +445,10 @@ Loop, %id%
 }
 Return
 
+#^t:: ; Set 2-minute timer
+SetTimer(2)
+return
+
 #t:: ; Set 5-minute timer
 SetTimer(5)
 return
@@ -433,11 +492,11 @@ return
 
 ; Ergodox functionality
 
-$+Backspace::Send {Delete}
+;$+Backspace::Send {Delete}
 
-;#q::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
+#w::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
+;#w::Send !{F4}
 #q::Send !{F4}
-#w::Send !{F4}
 #n::WinMinimize, A
 
 F24:: ;plover launch
@@ -454,3 +513,4 @@ If (!WinExist("Plover ahk_class wxWindowClassNR")) {
 }
 return
 
+F4::PlaceTooltip(MB_GetPlayState())
