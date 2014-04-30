@@ -111,6 +111,8 @@ $F1::
 SetTitleMatchMode 2
 IfWinActive, Inkscape
   Send {F1}
+IfWinActive, Q10
+  Send {F1}
 else
   PlaceTooltip("F1 blocked. Try Shift+F1 if you really want it.")
 return
