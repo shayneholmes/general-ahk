@@ -104,6 +104,32 @@ return
 #c::Send !{F12} ; reset partial count
 #IfWinActive
 
+#IfWinActive ahk_class TscShellContainerClass ; RDP window
+^!b::
+PlaceTooltip("RDP: Toggling fullscreen.")
+Send ^!{CtrlBreak}
+return
+
+LAlt & Tab::
+WinGet, Style, Style, A ; active window
+if (Style & 0x40000) { ; WS_SIZEBOX
+  Send {Blind}{Tab}
+} else {
+  Send {Blind}{PgUp} ; {blind} keeps the alt key down
+  PlaceTooltip("fake alttab.")
+}
+return
+
+#w::
+WinGet, Style, Style, A ; active window
+if (Style & 0x40000) { ; WS_SIZEBOX
+  PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
+} else {
+  Send !{F4}
+}
+return
+#IfWinActive ahk_class TscShellContainerClass
+
 /**
  * Disable stupid key combinations I find annoying
  */
