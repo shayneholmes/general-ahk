@@ -272,7 +272,7 @@ SendToMM(wParam, msg = 0x111, lParam = 0)
 #IfWinExist
 
 ; Remappings for MusicBee
-#IfWinExist MusicBee
+#IfWinExist ahk_class WindowsForms10.Window.8.app.0.2bf8098_r9_ad1
 
 Pause::Send {Media_Play_Pause}
 Pause & ScrollLock::Send {Media_Next}
@@ -280,7 +280,7 @@ Pause & PrintScreen::Send {Media_Prev}
 
 F22::
 Media_Play_Pause::
-bMB_PlayPause()
+MB_PlayPause()
 return
 
 F20::
