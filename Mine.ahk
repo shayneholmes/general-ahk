@@ -1,4 +1,4 @@
-;
+﻿;
 ; Author:         Shayne Holmes
 ;
 ; Script Function:
@@ -526,6 +526,18 @@ return
 ;#w::Send !{F4}
 #q::Send !{F4}
 #n::WinMinimize, A
+
+; F13::Run, "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+F14::Send μ
++F14::Send Μ
+F15::Send λ
++F15::Send Λ
+F16::Send α
++F16::Send Α
+F17::Send ∞
+
+;Infinity!μμΜΜαΑλΛ
+
 
 F24:: ;plover launch
 If (!WinExist("Plover ahk_class wxWindowClassNR")) {
