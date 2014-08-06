@@ -590,3 +590,15 @@ If (!WinExist("Plover ahk_class wxWindowClassNR")) {
 return
 
 F4::PlaceTooltip(MB_GetPlayState())
+
+#^r:: ; Reload
+send ^s ; save the script
+PlaceTooltip("Reloading script...")
+SetTimer,ReloadScript,1000
+return
+
+; Model M stuff
+; RCtrl::LWin
+; ScrollLock::LWin
+
+ 
