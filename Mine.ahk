@@ -23,6 +23,37 @@ Menu, Tray, Icon, icon.ico
 #Include MusicBeeIPC ; the path to the MusicBeeIPC SDK
 #Include MusicBeeIPC.ahk
 
+#Persistent
+SetBatchLines, -1
+Process, Priority,, High
+
+/*
+Gui +LastFound
+hWnd := WinExist()
+
+DllCall( "RegisterShellHookWindow", UInt,hWnd )
+MsgNum := DllCall( "RegisterWindowMessage", Str,"SHELLHOOK" )
+OnMessage( MsgNum, "ShellMessage" )
+Return
+
+ShellMessage( wParam,lParam )
+{
+    If ( wParam = 1 ) ;  HSHELL_WINDOWCREATED := 1
+    {
+        WinGetTitle, Title, ahk_id %lParam%
+        If  ( Title = "MusicBee" )
+            PlaceTooltip("Closing...") ; close it immideately
+	PlaceTooltip("Created: " . Title)
+    }
+    else 
+    {
+        WinGetTitle, Title, ahk_id %lParam%
+		PlaceTooltip(wParam . " " . Title)
+    }
+
+}
+*/
+
 DetectHiddenWindows, On
 
 ^/::
@@ -100,7 +131,7 @@ return
 
 ; App-specific hotkeys
 
-#IfWinActive ahk_class WindowsForms10.Window.8.app.0.218f99c ; WriteMonkey
+#IfWinActive WriteMonkey ; WriteMonkey
 #c::Send !{F12} ; reset partial count
 #IfWinActive
 
@@ -116,7 +147,6 @@ if (Style & 0x40000) { ; WS_SIZEBOX
   Send {Blind}{Tab}
 } else {
   Send {Blind}{PgUp} ; {blind} keeps the alt key down
-  PlaceTooltip("fake alttab.")
 }
 return
 
@@ -128,7 +158,7 @@ if (Style & 0x40000) { ; WS_SIZEBOX
   Send !{F4}
 }
 return
-#IfWinActive ahk_class TscShellContainerClass
+#IfWinActive
 
 /**
  * Disable stupid key combinations I find annoying
@@ -139,11 +169,16 @@ IfWinActive, Inkscape
   Send {F1}
 IfWinActive, Q10
   Send {F1}
+IfWinActive, ahk_class VICE
+  Send {F1}
 else
   PlaceTooltip("F1 blocked. Try Shift+F1 if you really want it.")
 return
 
 +F1::Send {F1}
+
+#IfWinActive ahk_class Chrome_WidgetWin_1
+^O::return
 
 /* Disable Ctrl+enter in Lync 
  */
@@ -300,14 +335,15 @@ SendToMM(wParam, msg = 0x111, lParam = 0)
 #IfWinExist
 
 ; Remappings for MusicBee
-#IfWinExist ahk_class WindowsForms10.Window.8.app.0.2bf8098_r9_ad1
+#IfWinExist MusicBee
 
-Pause::Send {Media_Play_Pause}
 Pause & ScrollLock::Send {Media_Next}
 Pause & PrintScreen::Send {Media_Prev}
 
 F22::
 Media_Play_Pause::
+Pause::
+; PlaceTooltip("Play/pause")
 MB_PlayPause()
 return
 
@@ -321,13 +357,13 @@ Media_Prev::
 MB_PreviousTrack()
 return
 
-^!Right:: ; fast forward 15 secs
-MB_SetPosition(MB_GetPosition() + 15000)
+^!Right:: ; fast forward 30 secs
+MB_SetPosition(MB_GetPosition() + 30000)
 Return
 
-^!Left:: ; rewind 5 secs
+^!Left:: ; rewind 10 secs
 
-time := (MB_GetPosition() - 5000)
+time := (MB_GetPosition() - 10000)
 if (time < 0)
   time := 0
 MB_SetPosition(time)
@@ -541,7 +577,7 @@ F17::Send ∞
 
 F24:: ;plover launch
 If (!WinExist("Plover ahk_class wxWindowClassNR")) {
-  PlaceToolTip("No Plover found; launching...", "cursor")
+  PlaceToolTip("No Plover found; launching...")
   DetectHiddenWindows, off
   Run, ..\Plover\plover.exe
   WinWait, Plover ahk_class wxWindowClassNR, , 10
