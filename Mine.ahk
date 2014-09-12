@@ -174,6 +174,9 @@ return
 /**
  * Disable stupid key combinations I find annoying
  */
+#u::return ; disable narrator
+#Enter::return ; other narrator
+
 $F1::
 SetTitleMatchMode 2
 IfWinActive, Inkscape
