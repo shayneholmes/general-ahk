@@ -605,6 +605,21 @@ return
 
 F4::PlaceTooltip(MB_GetPlayState())
 
++F24:: ;plover re-launch
+If (WinExist("Plover ahk_class wxWindowClassNR")) {
+  WinClose,,,5
+}
+  PlaceToolTip("Re-launching Plover...")
+  DetectHiddenWindows, off
+  Run, ..\Plover\plover.exe
+  WinWait, Plover ahk_class wxWindowClassNR, , 20
+  if ErrorLevel {
+    PlaceTooltip("Couldn't launch Plover.")
+  } else {
+    PlaceTooltip("Plover launched.")
+  }
+return
+
 #^r:: ; Reload
 send ^s ; save the script
 PlaceTooltip("Reloading script...")
