@@ -603,8 +603,6 @@ If (!WinExist("Plover ahk_class wxWindowClassNR")) {
 }
 return
 
-F4::PlaceTooltip(MB_GetPlayState())
-
 +F24:: ;plover re-launch
 If (WinExist("Plover ahk_class wxWindowClassNR")) {
   WinClose,,,5
