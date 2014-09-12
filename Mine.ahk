@@ -98,6 +98,17 @@ Win+S: Save and reload
 PlaceTooltip(HelpText, ,5000)
 return
 
+#IfWinActive LCWO ; cancel these hotstrings when I'm practicing Morse code
+
+:b0:nd:: ; legacy, was this before and I still type it all the time
+:b0:td::
+:b0:yd:: ; 1 day ago, for journaling
+:b0:ts:: ; 2013-03-22 (ISO standard, doncha know!)
+:b0:tt:: ; 2013-05-28@11:53 (kinda ISO standard)
+return
+
+#IfWinActive 
+
 /**
  * Insert current date for journaling
  */
