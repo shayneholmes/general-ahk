@@ -176,6 +176,7 @@ return
  */
 #u::return ; disable narrator
 #Enter::return ; other narrator
+#F16::return ; can't believe this is a problem, but disable shutdown swipe
 
 $F1::
 SetTitleMatchMode 2
