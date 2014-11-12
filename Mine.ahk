@@ -593,7 +593,7 @@ F17::Send ∞
 
 F24:: ;plover launch
 If (!WinExist("Plover ahk_class wxWindowClassNR")) {
-  PlaceToolTip("No Plover found; launching...")
+  PlaceToolTip("No Plover found; launching...", , 3000)
   DetectHiddenWindows, off
   Run, ..\Plover\plover.exe
   WinWait, Plover ahk_class wxWindowClassNR, , 20
@@ -606,6 +606,7 @@ If (!WinExist("Plover ahk_class wxWindowClassNR")) {
 return
 
 +F24:: ;plover re-launch
++F23:: ;plover re-launch
 If (WinExist("Plover ahk_class wxWindowClassNR")) {
   WinClose,,,5
 }
