@@ -355,20 +355,21 @@ SendToMM(wParam, msg = 0x111, lParam = 0)
 Pause & ScrollLock::Send {Media_Next}
 Pause & PrintScreen::Send {Media_Prev}
 
-F22::
+F12::
 Media_Play_Pause::
 Pause::
 ; PlaceTooltip("Play/pause")
 MB_PlayPause()
 return
 
-F20::
+F11::
 Media_Next::
 MB_NextTrack()
 return
 
-F21::
+F10::
 Media_Prev::
++Media_Next::
 MB_PreviousTrack()
 return
 
