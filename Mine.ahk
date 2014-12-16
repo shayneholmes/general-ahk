@@ -254,6 +254,9 @@ if (SendToMM(0, 0x400, 104) == 1) { ; 0x400 is WM_USER, 104 is IPC_ISPLAYING
 if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
   MB_PlayPause()
 }
+if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try to pause Chrome
+    Send +!{Home}
+}
 Sleep, 200 ; wait for Win key to lift
 DllCall("LockWorkStation")
 Sleep, 200
@@ -275,6 +278,7 @@ return
 Media_Play_Pause & 9::
 Media_Play_Pause & PgDn::
 Media_Prev::
++Media_Next::
 $F10:: ; previous track
 ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
 return
@@ -392,6 +396,21 @@ Return
 ^!Down:: ; decrease volume
 MB_SetVolume(MB_GetVolume()-10)
 Return
+
+#IfWinExist ahk_class Chrome_WidgetWin_1
+
+Media_Play_Pause::
+Send +!{Home}
+return
+
+Media_Next::
+Send +!{PgDn}
+return
+
++Media_Next::
+Media_Prev::
+Send +!{PgUp}
+return
 
 #IfWinExist
 
@@ -651,3 +670,18 @@ RoA(WinTitle, Target) {	; RoA means "RunOrActivate"
 	else
 		Run, %Target%
 }
+
+IsMusicPlaying() {
+audioMeter := VA_GetAudioMeter()
+
+VA_IAudioMeterInformation_GetMeteringChannelCount(audioMeter, channelCount)
+
+; "The peak value for each channel is recorded over one device
+;  period and made available during the subsequent device period."
+VA_GetDevicePeriod("capture", devicePeriod)
+
+    ; Get the peak value across all channels.
+    VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)    
+    return (peakValue > 0.01)
+}
+
