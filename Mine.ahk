@@ -636,7 +636,7 @@ return
 ; RCtrl::LWin
 ; ScrollLock::LWin
 
-:oc:htr::{BS}{Home}Hey {End},{Enter}{Enter}Which of your home teaching families did you visit in October?{Enter}{Enter}Thanks,{Enter}{Enter}Shayne
+:oc:htr::{BS}{Home}Hey {End},{Enter}{Enter}Which of your home teaching families did you visit in November?{Enter}{Enter}Thanks,{Enter}{Enter}Shayne{Shift Down}{Tab}{Shift Up}Home teaching in November?
 
 #e:: ; Substitute FreeCommander for Explorer
 If WinExist("ahk_class FreeCommanderXE.SingleInst.1") {
