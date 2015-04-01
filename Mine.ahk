@@ -130,6 +130,7 @@ return
 #IfWinActive
 
 #IfWinActive ahk_class TscShellContainerClass ; RDP window
+
 ^!b::
 PlaceTooltip("RDP: Toggling fullscreen.")
 Send ^!{CtrlBreak}
@@ -152,6 +153,17 @@ if (Style & 0x40000) { ; WS_SIZEBOX
   Send !{F4}
 }
 return
+
+#IfWinActive ahk_class Chrome_WidgetWin_1
+
+^O::return
+
+#IfWinActive ahk_class LyncConversationWindowClass
+
+^Enter::
+Send {Enter} ; Instead of starting video chat
+return
+
 #IfWinActive
 
 /**
@@ -175,15 +187,6 @@ return
 
 +F1::Send {F1}
 
-#IfWinActive ahk_class Chrome_WidgetWin_1
-^O::return
-
-/* Disable Ctrl+enter in Lync 
- */
-#IfWinActive ahk_class LyncConversationWindowClass
-^Enter::
-Send {Enter}
-return
 #IfWinActive
 
 /**
