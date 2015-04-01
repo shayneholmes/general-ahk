@@ -609,10 +609,6 @@ PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
 
-; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
-; RCtrl::LWin
-; ScrollLock::LWin
-
 :oc:htr::{BS}{Home}Hey {End},{Enter}{Enter}It's that time of the month again{!} Which of your home teaching families did you visit in January? I've got you listed as the home teacher of:{Enter}{Enter}.{Enter}{Enter}Thanks,{Enter}{Enter}Shayne{Shift Down}{Tab}{Shift Up}Home teaching in January?{Tab}{Down 5}{End} 
 
 #e:: ; Substitute FreeCommander for Explorer
@@ -652,6 +648,12 @@ VA_GetDevicePeriod("capture", devicePeriod)
     VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)    
     return (peakValue > 0.01)
 }
+
+; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
+; RCtrl::LWin
+; ScrollLock::LWin
+; LCtrl & LWin::Send {Alt Down}
+; LCtrl & LWin Up::Send {Alt Up}
 
 ErgodoxConnected()
 {
