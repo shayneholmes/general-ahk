@@ -649,6 +649,9 @@ VA_GetDevicePeriod("capture", devicePeriod)
     return (peakValue > 0.01)
 }
 
+; Get rid of Win+Tab, replace it with the more helpful and conventional Alt+Tab
+LWin & Tab::AltTab
+
 ; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
 ; RCtrl::LWin
 ; ScrollLock::LWin
