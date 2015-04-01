@@ -372,6 +372,7 @@ MB_SetVolume(MB_GetVolume()-10)
 Return
 
 #IfWinExist ahk_class Chrome_WidgetWin_1
+; StreamKeys hotkeys
 
 Media_Play_Pause::
 Send +!{Home}
