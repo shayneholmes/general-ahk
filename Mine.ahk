@@ -55,10 +55,11 @@ ts: TimeStamp (2013-03-29)
 tt: Today+Time (2013-05-28@11:53)
 
 LWin: Show Launchy (Alt+F10)
-Win+T: Set/cancel timer
+Win+T: Set/cancel timer (5 by default, ctrl=2, shift=15)
 
 Ctrl+Alt+A: Window on top
 Ctrl+Alt+B: Toggle window border
+Win+Shift+R: Restore all windows
 Win+H: Hide current window
 Win+U: Unhide window
 
