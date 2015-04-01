@@ -230,10 +230,7 @@ return
  */
 #o::
 {
-if (SendToMM(0, 0x400, 104) == 1) { ; 0x400 is WM_USER, 104 is IPC_ISPLAYING
-  SendToMM(40046) ; pause
-}
-else if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
+if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
   MB_PlayPause()
 }
 else if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try to pause Chrome
@@ -245,7 +242,6 @@ Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
 return
-#If
 
 ; Hook into next/prev if MPC is up and running
 #IfWinExist ahk_class MediaPlayerClassicW
@@ -264,77 +260,6 @@ Media_Play_Pause & PgDn::
 $F10:: ; previous track
 ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
 return
-
-#IfWinExist
-
-; Only remap F10-F12 if we're running MediaMonkey
-#IfWinExist MediaMonkey ahk_class TFMainWindow
-
-/**
- * Hotkeys for MediaMonkey
- */
-Pause::Send {Media_Play_Pause}
-Pause & ScrollLock::Send {Media_Next}
-Pause & PrintScreen::Send {Media_Prev}
-
-Media_Play_Pause::
-SendToMM(39999)
-return
-
-Media_Next::
-SendToMM(40048)
-return
-
-Media_Prev::
-+Media_Next::
-SendToMM(40044)
-return
-
-^!Right:: ; fast forward 15 secs
-SendToMM(40148)
-SendToMM(40148)
-SendToMM(40148)
-Return
-
-^!Left:: ; rewind 5 secs
-SendToMM(40144)
-Return
-
-^!Up:: ; increase volume
-SendToMM(40058)
-SendToMM(40058)
-SendToMM(40058)
-SendToMM(40058)
-SendToMM(40058)
-Return
-
-^!Down:: ; decrease volume
-SendToMM(40059)
-SendToMM(40059)
-SendToMM(40059)
-SendToMM(40059)
-SendToMM(40059)
-Return
-
-/**
- * Helper function for MediaMonkey
- */
-SendToMM(wParam, msg = 0x111, lParam = 0)
-{
-  DetectHiddenWindows, On
-  IfWinNotExist MediaMonkey ahk_class TFMainWindow
-  {
-    ; MsgBox, "MediaMonkey not found"
-    return -1
-  }
-  ; Otherwise, the above has set the "last found" window for use below.
-  SendMessage, msg, wParam, lParam
-  ret := ErrorLevel
-  DetectHiddenWindows, Off
-  return ret
-}
-
-#IfWinExist
 
 ; Remappings for MusicBee
 #IfWinExist MusicBee
