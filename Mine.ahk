@@ -388,6 +388,10 @@ return
 
 ; Window commands
 
+#w::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
+#q::Send !{F4}
+#n::WinMinimize, A
+
 ^!a::
 Winset, Alwaysontop, , A
 WinGet, ExStyle, ExStyle, A
@@ -494,13 +498,6 @@ return
 
 ; Ergodox functionality
 
-;$+Backspace::Send {Delete}
-
-#w::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
-;#w::Send !{F4}
-#q::Send !{F4}
-#n::WinMinimize, A
-
 ; F13::Run, "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 F14::Send μ
 +F14::Send Μ
@@ -509,9 +506,6 @@ F15::Send λ
 F16::Send α
 +F16::Send Α
 F17::Send ∞
-
-;Infinity!μμΜΜαΑλΛ
-
 
 F24:: ;plover launch
 LaunchPlover:
@@ -535,8 +529,6 @@ PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
 
-:oc:htr::{BS}{Home}Hey {End},{Enter}{Enter}It's that time of the month again{!} Which of your home teaching families did you visit in January? I've got you listed as the home teacher of:{Enter}{Enter}.{Enter}{Enter}Thanks,{Enter}{Enter}Shayne{Shift Down}{Tab}{Shift Up}Home teaching in January?{Tab}{Down 5}{End} 
-
 #e:: ; Substitute FreeCommander for Explorer
 If WinExist("ahk_class FreeCommanderXE.SingleInst.1") {
   WinActivate
@@ -548,17 +540,6 @@ If WinExist("ahk_class FreeCommanderXE.SingleInst.1") {
 } else {
   Run explorer.exe
 }
-return
-
-RoA(WinTitle, Target) {	; RoA means "RunOrActivate"
-	IfWinExist, %WinTitle%
-		WinActivate, %WinTitle%
-	else
-		Run, %Target%
-}
-
-#c::
-; PlaceTooltip(IsMusicPlaying())
 return
 
 IsMusicPlaying() {
