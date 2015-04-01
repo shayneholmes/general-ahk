@@ -239,17 +239,17 @@ return
 ; Hook into next/prev if MPC is up and running
 #IfWinExist ahk_class MediaPlayerClassicW
 
+Media_Next::
 Media_Play_Pause & 0::
 Media_Play_Pause & PgUp::
-Media_Next::
 $F11:: ; next track
 ControlSend,,{PgDn},ahk_class MediaPlayerClassicW
 return
 
-Media_Play_Pause & 9::
-Media_Play_Pause & PgDn::
 Media_Prev::
 +Media_Next::
+Media_Play_Pause & 9::
+Media_Play_Pause & PgDn::
 $F10:: ; previous track
 ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
 return
@@ -275,6 +275,7 @@ SendToMM(40048)
 return
 
 Media_Prev::
++Media_Next::
 SendToMM(40044)
 return
 
@@ -330,21 +331,23 @@ SendToMM(wParam, msg = 0x111, lParam = 0)
 Pause & ScrollLock::Send {Media_Next}
 Pause & PrintScreen::Send {Media_Prev}
 
-F12::
 Media_Play_Pause::
+SetErgodoxConnected()
+F12::
 Pause::
 ; PlaceTooltip("Play/pause")
 MB_PlayPause()
 return
 
-F11::
 Media_Next::
+F11::
 MB_NextTrack()
 return
 
-F10::
 Media_Prev::
 +Media_Next::
+F10::
++F11::
 MB_PreviousTrack()
 return
 
@@ -628,6 +631,10 @@ RoA(WinTitle, Target) {	; RoA means "RunOrActivate"
 		Run, %Target%
 }
 
+#c::
+; PlaceTooltip(IsMusicPlaying())
+return
+
 IsMusicPlaying() {
 audioMeter := VA_GetAudioMeter()
 
@@ -642,3 +649,20 @@ VA_GetDevicePeriod("capture", devicePeriod)
     return (peakValue > 0.01)
 }
 
+ErgodoxConnected()
+{
+  return ErgodoxState
+}
+
+SetErgodoxConnected()
+{
+  global ErgodoxState
+  If (ErgodoxState <> true) {
+    PlaceTooltip("Noticed Ergodox. Setting keys right." . ErgodoxState)
+    ErgodoxState := true
+    Hotkey, IfWinExist, MusicBee
+    Hotkey, F12, Off
+    Hotkey, F11, Off
+    Hotkey, F10, Off
+  }
+}
