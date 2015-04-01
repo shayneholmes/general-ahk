@@ -443,8 +443,8 @@ return
 #^e::Run, notepad.exe %A_ScriptFullPath%
 
 ; Save and reload ahk if currently editing
-#ifwinactive Mine
-#s::
+#ifwinactive Mine.ahk
+^s::
 send ^s ; save the script
 PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
