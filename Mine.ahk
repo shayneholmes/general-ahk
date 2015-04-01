@@ -439,12 +439,6 @@ winisborder := (ExStyle & 0xC00000) ; 0xC00000 is WS_CAPTION
 PlaceTooltip("Window " . (winisborder ? "no longer " : "") . "unbordered (Ctrl+Alt+B)", "Window")
 return
 
-
-#s::
-Send {Printscreen}
-PlaceTooltip("Took screenshot.")
-return
-
 ; edit script
 #^e::Run, notepad.exe %A_ScriptFullPath%
 
