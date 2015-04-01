@@ -182,20 +182,17 @@ return
  */
 LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/Hotkeys.htm
            ; without this, the windows key doesn't work for other shortcuts like it should!
+
+#IfWinExist Launchy ahk_class QTool
 LWin::
-Process, Exist, Launchy.exe
-LaunchyProcessActive := (ErrorLevel != 0)
-DetectHiddenWindows, On
-SetTitleMatchMode 2
-WinGet, ismaxed, MinMax, A /* Active Window */
-if ((!LaunchyProcessActive && !WinExist("ahk_class QTool")) or ((WinActive("Virtual Machine Connection") or WinActive("Remote Desktop Connection")) and (ismaxed == 1 /* is maximized */)))
-{
-	Send {LWin}
-}
-else ; trigger Launchy (Alt+F10)
-{
-	Send !{F10}
-}
+; SetTitleMatchMode 2
+; WinGet, Style, Style, A ; active window
+; if ((WinActive("Virtual Machine Connection") or WinActive("Remote Desktop Connection")) and (!(Style & 0x40000)))
+; {
+;    Send !{Home}
+; } else {
+    Send !{F10}
+; }
 return
 
 /**
