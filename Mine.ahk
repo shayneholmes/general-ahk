@@ -182,6 +182,33 @@ return
 $F6::Send ^+1
 $F7::Send ^+2
 
+; Windows Explorer
+#IfWinActive ahk_class CabinetWClass
+
+; Toggle hidden files and file extensions
+
+; Ctrl+Alt+H - Toggle hidden files
+^!h::
+    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
+    If HiddenFiles_Status = 2
+        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 1
+    Else
+        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 2
+    Send, {F5}
+    PlaceTooltip("Hidden files toggled (Ctrl+Alt+H)", "Window")
+    Return
+
+; Ctrl+Alt+E - Toggle extensions
+^!e::
+    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt
+    If HiddenFiles_Status = 1
+        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 0
+    Else
+        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 1
+    Send, {F5}
+    PlaceTooltip("Extensions toggled (Ctrl+Alt+E)", "Window")
+    Return
+
 #IfWinActive
 
 /**
@@ -321,34 +348,6 @@ return
 Media_Prev::
 Send +!{PgUp}
 return
-
-#IfWinExist
-
-; Toggle hidden files and file extensions
-; Only run when Windows Explorer is active
-#IfWinActive ahk_class CabinetWClass
-
-; Ctrl+Alt+H - Toggle hidden files
-^!h::
-    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
-    If HiddenFiles_Status = 2
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 1
-    Else
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 2
-    Send, {F5}
-    PlaceTooltip("Hidden files toggled (Ctrl+Alt+H)", "Window")
-    Return
-
-; Ctrl+Alt+E - Toggle extensions
-^!e::
-    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt
-    If HiddenFiles_Status = 1
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 0
-    Else
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 1
-    Send, {F5}
-    PlaceTooltip("Extensions toggled (Ctrl+Alt+E)", "Window")
-    Return
 
 #IfWinActive
 
