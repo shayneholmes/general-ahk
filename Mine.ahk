@@ -27,35 +27,6 @@ Menu, Tray, Icon, icon.ico
 SetBatchLines, -1
 Process, Priority,, High
 
-/*
-Gui +LastFound
-hWnd := WinExist()
-
-DllCall( "RegisterShellHookWindow", UInt,hWnd )
-MsgNum := DllCall( "RegisterWindowMessage", Str,"SHELLHOOK" )
-OnMessage( MsgNum, "ShellMessage" )
-Return
-
-ShellMessage( wParam,lParam )
-{
-    If ( wParam = 1 ) ;  HSHELL_WINDOWCREATED := 1
-    {
-        WinGetTitle, Title, ahk_id %lParam%
-        If  ( Title = "MusicBee" )
-            PlaceTooltip("Closing...") ; close it immideately
-	PlaceTooltip("Created: " . Title)
-    }
-    else 
-    {
-        WinGetTitle, Title, ahk_id %lParam%
-		PlaceTooltip(wParam . " " . Title)
-    }
-
-}
-*/
-
-DetectHiddenWindows, On
-
 ^/::
 ^?::
 HelpText =
