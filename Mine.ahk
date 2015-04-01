@@ -69,6 +69,9 @@ Win+S: Save and reload
 PlaceTooltip(HelpText, ,5000)
 return
 
+#IfWinActive ResophNotes
+^e::^f
+
 #IfWinActive LCWO ; cancel these hotstrings when I'm practicing Morse code
 
 :b0:nd:: ; legacy, was this before and I still type it all the time
