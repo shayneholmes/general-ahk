@@ -292,7 +292,6 @@ MB_SetPosition(MB_GetPosition() + 30000)
 Return
 
 ^!Left:: ; rewind 10 secs
-
 time := (MB_GetPosition() - 10000)
 if (time < 0)
   time := 0
