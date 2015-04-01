@@ -222,10 +222,10 @@ $F7::Send ^+2
 if (SendToMM(0, 0x400, 104) == 1) { ; 0x400 is WM_USER, 104 is IPC_ISPLAYING
   SendToMM(40046) ; pause
 }
-if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
+else if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
   MB_PlayPause()
 }
-if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try to pause Chrome
+else if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try to pause Chrome
     Send +!{Home}
 }
 Sleep, 200 ; wait for Win key to lift
