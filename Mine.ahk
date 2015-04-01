@@ -24,7 +24,7 @@ Menu, Tray, Icon, icon.ico ; set tray icon
 #Include MusicBeeIPC.ahk
 
 #Persistent
-SetBatchLines, -1
+SetBatchLines, 10ms
 Process, Priority,, High
 
 ; Shell Hook
