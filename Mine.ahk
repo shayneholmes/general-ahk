@@ -588,9 +588,11 @@ F17::Send ∞
 
 
 F24:: ;plover launch
+LaunchPlover:
 If (!WinExist("Plover ahk_class wxWindowClassNR")) {
   PlaceToolTip("No Plover found; launching...", , 3000)
   Run, ..\Plover\plover.exe
+  WinWait, Plover ahk_class wxWindowClassNR, , 15
 }
 return
 
@@ -599,8 +601,7 @@ return
 If (WinExist("Plover ahk_class wxWindowClassNR")) {
   WinClose,,,5
 }
-  PlaceToolTip("Re-launching Plover...")
-  Run, ..\Plover\plover.exe
+Goto LaunchPlover
 return
 
 #^r:: ; Reload
