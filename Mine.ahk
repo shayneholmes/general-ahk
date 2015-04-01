@@ -324,14 +324,6 @@ return
 
 #IfWinExist
 
-/**
- * Alt-tab combos (with JoyToKey)
- */
-; Short-press: simple alt+tab, or advance menu if it's up
-RAlt & F3::AltTab
-; Long-press: bring up the menu (alt in the hotkey guarantees it will disappear when let up)
-^!F6::Send {Alt down}{tab} ; start the menu
-
 ; Toggle hidden files and file extensions
 ; Only run when Windows Explorer is active
 #IfWinActive ahk_class CabinetWClass
