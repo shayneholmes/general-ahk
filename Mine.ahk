@@ -461,6 +461,14 @@ SetTimer,ReloadScript,Off
 Reload
 return
 
+; Save and reload rainmeter if currently editing
+#IfWinActive .ini
+^s::
+PlaceTooltip("Reloading rainmeter...")
+send ^s ; save the script
+Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!Refresh *]
+return
+
 ; Product Studio
 #IfWinActive ahk_class PSWnd
 ^Backspace::Send +^{Left}{Backspace}
