@@ -605,7 +605,6 @@ Goto LaunchPlover
 return
 
 #^r:: ; Reload
-send ^s ; save the script
 PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
