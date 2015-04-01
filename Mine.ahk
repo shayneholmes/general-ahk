@@ -406,7 +406,10 @@ winisborder := (ExStyle & 0xC00000) ; 0xC00000 is WS_CAPTION
 PlaceTooltip("Window " . (winisborder ? "no longer " : "") . "unbordered (Ctrl+Alt+B)", "Window")
 return
 
-^!v:: clipboard=%clipboard% sendraw %clipboard% return
+^!v::
+clipboard=%clipboard%
+sendraw %clipboard%
+return
 
 ;------------------
 ; Tooltip functions
