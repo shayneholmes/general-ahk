@@ -609,7 +609,7 @@ PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
 
-; Model M stuff
+; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
 ; RCtrl::LWin
 ; ScrollLock::LWin
 
