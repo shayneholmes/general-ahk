@@ -208,6 +208,40 @@ $F7::Send ^+2
     Send, {F5}
     PlaceTooltip("Extensions toggled (Ctrl+Alt+E)", "Window")
     Return
+	
+; Save and reload ahk if currently editing
+#ifwinactive Mine.ahk
+^s::
+send ^s ; save the script
+PlaceTooltip("Reloading script...")
+SetTimer,ReloadScript,1000
+return
+
+ReloadScript:
+SetTimer,ReloadScript,Off
+Reload
+return
+
+; Save and reload rainmeter if currently editing
+#IfWinActive .ini
+^s::
+PlaceTooltip("Reloading rainmeter...")
+send ^s ; save the script
+Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!Refresh *]
+return
+
+; Product Studio
+#IfWinActive ahk_class PSWnd
+^Backspace::Send +^{Left}{Backspace}
+^Enter::Send {F5}
+^w::Send ^{F4}
+#IfWinActive
+
+; ctrl+v paste in cmd prompt
+#IfWinActive ahk_class ConsoleWindowClass
+^V:: SendInput {Raw}%clipboard%
+return
+
 
 #IfWinActive
 
@@ -351,6 +385,8 @@ return
 
 #IfWinActive
 
+; Window commands
+
 ^!a::
 Winset, Alwaysontop, , A
 WinGet, ExStyle, ExStyle, A
@@ -365,41 +401,6 @@ winisborder := (ExStyle & 0xC00000) ; 0xC00000 is WS_CAPTION
 PlaceTooltip("Window " . (winisborder ? "no longer " : "") . "unbordered (Ctrl+Alt+B)", "Window")
 return
 
-; edit script
-#^e::Run, notepad.exe %A_ScriptFullPath%
-
-; Save and reload ahk if currently editing
-#ifwinactive Mine.ahk
-^s::
-send ^s ; save the script
-PlaceTooltip("Reloading script...")
-SetTimer,ReloadScript,1000
-return
-
-ReloadScript:
-SetTimer,ReloadScript,Off
-Reload
-return
-
-; Save and reload rainmeter if currently editing
-#IfWinActive .ini
-^s::
-PlaceTooltip("Reloading rainmeter...")
-send ^s ; save the script
-Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!Refresh *]
-return
-
-; Product Studio
-#IfWinActive ahk_class PSWnd
-^Backspace::Send +^{Left}{Backspace}
-^Enter::Send {F5}
-^w::Send ^{F4}
-#IfWinActive
-
-; ctrl+v paste in cmd prompt
-#IfWinActive ahk_class ConsoleWindowClass
-^V:: SendInput {Raw}%clipboard%
-return
 #IfWinActive
 
 ^!v:: clipboard=%clipboard% sendraw %clipboard% return
