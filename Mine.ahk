@@ -626,6 +626,7 @@ If WinExist("ahk_class FreeCommanderXE.SingleInst.1") {
 } else {
   Run explorer.exe
 }
+return
 
 RoA(WinTitle, Target) {	; RoA means "RunOrActivate"
 	IfWinExist, %WinTitle%
