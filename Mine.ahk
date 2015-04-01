@@ -15,8 +15,8 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 SetTitleMatchMode 2 ; for #ifwinnotactive calls
-DetectHiddenWindows, on ; for minimized MM
-Menu, Tray, Icon, icon.ico
+DetectHiddenWindows, on
+Menu, Tray, Icon, icon.ico ; set tray icon
 
 #Include lib
 #Include minimizetray.ahk
@@ -62,13 +62,9 @@ Ctrl+Alt+B: Toggle window border
 Win+H: Hide current window
 Win+U: Unhide window
 
-Outlook keys:
-F6: Quick Action 1
-F7: Quick Action 2
-
 Win+O: Lock workstation
 
-MediaMonkey:
+Media Keys:
 F12: Play/Pause
 F11: Next
 F10: Previous
@@ -78,9 +74,6 @@ Ctrl+Shift+Up/Down: Volume
 Explorer:
 Ctrl+Alt+H: Toggle hidden files
 Ctrl+Alt+E: Toggle extensions
-
-When editing script:
-Win+S: Save and reload
 )
 PlaceTooltip(HelpText, ,5000)
 return
