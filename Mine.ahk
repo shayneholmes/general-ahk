@@ -27,6 +27,22 @@ Menu, Tray, Icon, icon.ico
 SetBatchLines, -1
 Process, Priority,, High
 
+; Shell Hook
+Gui +LastFound
+hWnd := WinExist()
+
+DllCall("RegisterShellHookWindow", UInt,hWnd)
+MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
+OnMessage(MsgNum, "ShellMessage")
+
+ShellMessage(wParam, lParam) {
+; Execute a command based on wParam and lParam
+  If ((wParam = 2 OR wParam = 6) AND WinExist("Plover ahk_id " . lParam )) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
+    ; Plover update
+    UpdatePloverWindowStatus()
+  }
+}
+
 ^/::
 ^?::
 HelpText =
@@ -674,4 +690,21 @@ SetErgodoxConnected()
     Hotkey, F11, Off
     Hotkey, F10, Off
   }
+}
+
+UpdatePloverWindowStatus() {
+; Update Rainmeter
+WinGetTitle, PloverTitle, ahk_class wxWindowClassNR ahk_exe plover.exe
+If ((PloverLastStatus != -1) and InStr(PloverTitle, ": running")) {
+  PloverLastStatus := -1
+  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus -1][!Update]
+}
+Else If ((PloverLastStatus != 1) and InStr(PloverTitle, ": stopped")) {
+  PloverLastStatus := 1
+  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus 1][!Update]
+}
+Else If (PloverTitle = "") {
+  PloverLastStatus := 0
+  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus 0][!Update]
+}
 }
