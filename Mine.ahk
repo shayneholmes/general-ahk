@@ -164,6 +164,24 @@ return
 Send {Enter} ; Instead of starting video chat
 return
 
+/**
+ * Ctrl+Backspace in Notepad
+ */
+#IfWinActive ahk_class Notepad
+^Backspace::Send +^{Left}{Backspace}
+#IfWinActive
+
+/**
+ * Outlook keys
+ */
+#IfWinActive ahk_class rctrl_renwnd32
+
+/**
+ * One-key Archive action in Outlook
+ */
+$F6::Send ^+1
+$F7::Send ^+2
+
 #IfWinActive
 
 /**
@@ -187,8 +205,6 @@ return
 
 +F1::Send {F1}
 
-#IfWinActive
-
 /**
  * Show Launchy
  */
@@ -207,23 +223,6 @@ LWin::
 ; }
 return
 
-/**
- * Ctrl+Backspace in Notepad
- */
-#IfWinActive ahk_class Notepad
-^Backspace::Send +^{Left}{Backspace}
-#IfWinActive
-
-/**
- * Outlook keys
- */
-#IfWinActive ahk_class rctrl_renwnd32
-
-/**
- * One-key Archive action in Outlook
- */
-$F6::Send ^+1
-$F7::Send ^+2
 #IfWinActive
 
 /**
