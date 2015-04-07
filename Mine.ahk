@@ -34,12 +34,60 @@ hWnd := WinExist()
 DllCall("RegisterShellHookWindow", UInt,hWnd)
 MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
+OnMessage(16687, "RainmeterWindowMessage")
 
 ShellMessage(wParam, lParam) {
+global AntimicroOutlookActive
 ; Execute a command based on wParam and lParam
-  If ((wParam = 2 OR wParam = 6) AND WinExist("Plover ahk_id " . lParam )) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
-    ; Plover update
-    UpdatePloverWindowStatus()
+  If (wParam = 2 OR wParam = 6) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
+    WinGet, currentProcess, ProcessName, ahk_id %lParam%
+    ; PlaceToolTip("Window redrawn: " . currentProcess)
+
+    If (currentProcess = "plover.exe") {
+      ; Plover update
+      UpdatePloverWindowStatus()
+    }
+  }
+  If (wParam = 4) { ; HSHELL_WINDOWACTIVATED
+    WinGet, currentProcess, ProcessName, ahk_id %lParam%
+    ; PlaceToolTip("Window activated: " . currentProcess)
+
+    ; Update Antimicro for Outlook transitions
+    OutlookActive := (currentProcess = "outlook.exe") AND WinActive("Inbox ahk_id" . lParam . " ahk_exe Outlook.exe")
+    If (OutlookActive <> AntimicroOutlookActive) {
+	    UpdateAntimicro(OutlookActive)
+    }
+  }
+}
+
+AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
+AntimicroExists := FileExist(AntimicroPath)
+
+UpdateAntimicro(outlookActive) {
+  global AntimicroPath, AntimicroExists, AntimicroOutlookActive
+  profileName := outlookActive ? "Outlook" : "Mouse"
+  Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
+  AntimicroOutlookActive := outlookActive
+}
+
+RainmeterPath := "C:\Program Files\Rainmeter\rainmeter.exe"
+RainmeterExists := FileExist(RainmeterPath)
+
+SendRainmeterCommand(Command) {
+  global RainmeterPath, RainmeterExists
+  if (RainmeterExists) {
+    Run, %RainmeterPath% %Command%
+  }
+}
+
+RainmeterWindowMessage(wParam, lParam) { 
+  global TimerUnderway
+  If (wParam = 0) { ; new timer
+    TimerUnderway = 0
+    SetTimer(lParam, false)
+  } Else If (wParam = 1) { ; timer ended
+    TimerUnderway = 1
+    SetTimer(lParam, false)
   }
 }
 
@@ -55,7 +103,7 @@ ts: TimeStamp (2013-03-29)
 tt: Today+Time (2013-05-28@11:53)
 
 LWin: Show Launchy (Alt+F10)
-Win+T: Set/cancel timer (5 by default, ctrl=2, shift=15)
+Win+T: Set/cancel timer (15 by default, ctrl=2, shift=5)
 
 Ctrl+Alt+A: Window on top
 Ctrl+Alt+B: Toggle window border
@@ -226,9 +274,13 @@ return
 ; Save and reload rainmeter if currently editing
 #IfWinActive .ini
 ^s::
-PlaceTooltip("Reloading rainmeter...")
+WinGetTitle, Title, A
+RegExMatch(Title, "(\w+)\.ini", SubPat)
+If (SubPat <> "") {
+PlaceTooltip("Reloading rainmeter skin " . SubPat1 . "...")
 send ^s ; save the script
-Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!Refresh *]
+SendRainmeterCommand("[!Refresh %SubPat1%]")
+}
 return
 
 ; Product Studio
@@ -455,40 +507,63 @@ Loop, %id%
 Return
 
 #^t:: ; Set 2-minute timer
-SetTimer(2)
+SetTimer(2*60)
 return
 
-#t:: ; Set 5-minute timer
-SetTimer(5)
+#+t:: ; Set 5-minute timer
+SetTimer(5*60)
 return
 
-#+t:: ; Set 15-minute timer
-SetTimer(15)
+#t:: ; Set 15-minute timer
+SetTimer(15*60)
 return
 
-SetTimer(minutes=5)
+SetTimer(Seconds, FromAHK = true)
 {
+  Color   := "4,192,64,255"
+  TimerCount = 0
+  If (Seconds = 15*60) {
+    Color   := "255,0,0,255"
+    TimerCount = 1
+  } Else If (Seconds = 5*60) {
+    Color   := "96,96,128,255"
+  }
+
+  If (mod(Seconds,60) = 0) {
+    PrettyTime := Seconds // 60 . " minutes"
+  } Else {
+    PrettyTime := Seconds . " seconds"
+  }
+
     global TimerUnderway
     global TimerStarted
-    if TimerUnderway {
-            SetTimer, TimerEnd, off
-            TimerEnded := A_TickCount
-            Duration := (TimerEnded - TimerStarted) / 1000
-            T = 20000101000000
-            T += Duration, Seconds
-            FormatTime FormdT, %T%, mm:ss
-            PlaceTooltip("Timer canceled after " . FormdT, , 3000)
-            TimerUnderway = 0
-            SoundPlay, alarmcancel.wav
-            Menu, Tray, Icon, icon.ico
-    } else {
+    if (not TimerUnderway) {
             TimerStarted := A_TickCount
-            delay := -60000*minutes
-            SetTimer, TimerEnd, %delay%
-            PlaceTooltip("Timer set for " . minutes . " minutes.", , 3000)
+            If (FromAHK) {
+              PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
+              SoundPlay, alarmstart.wav
+              SendRainmeterCommand("[!SetVariable ActiveTimerCount %TimerCount%][!SetVariable TimerDuration %Seconds%][!Update][!SetVariable ColorTimerArc %Color% ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update]")
+              delay := -1000*Seconds
+              SetTimer, TimerEnd, %delay%
+            } else {
+              SetTimer, TimerEnd, off
+            }
             TimerUnderway = 1
-            SoundPlay, alarmstart.wav
             Menu, Tray, Icon, timer.ico
+    } else {
+            If (FromAHK) {
+               SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update]")
+               SoundPlay, alarmcancel.wav
+               TimerEnded := A_TickCount
+               Duration := (TimerEnded - TimerStarted) / 1000
+               T = 20000101000000
+               T += Duration, Seconds
+               FormatTime FormdT, %T%, mm:ss
+               PlaceTooltip("Timer canceled after " . FormdT, , 3000)
+            }
+            SetTimer, TimerEnd, off
+            TimerUnderway = 0
+            Menu, Tray, Icon, icon.ico
     }
 }
 
@@ -591,14 +666,14 @@ UpdatePloverWindowStatus() {
 WinGetTitle, PloverTitle, ahk_class wxWindowClassNR ahk_exe plover.exe
 If ((PloverLastStatus != -1) and InStr(PloverTitle, ": running")) {
   PloverLastStatus := -1
-  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus -1][!Update]
+  SendRainmeterCommand("[!SetVariable PloverStatus -1][!Update]")
 }
 Else If ((PloverLastStatus != 1) and InStr(PloverTitle, ": stopped")) {
   PloverLastStatus := 1
-  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus 1][!Update]
+  SendRainmeterCommand("[!SetVariable PloverStatus 1][!Update]")
 }
 Else If (PloverTitle = "") {
   PloverLastStatus := 0
-  Run, "C:\Program Files\Rainmeter\rainmeter.exe" [!SetVariable PloverStatus 0][!Update]
+  SendRainmeterCommand("[!SetVariable PloverStatus 0][!Update]")
 }
 }
