@@ -30,7 +30,6 @@ Process, Priority,, High
 ; Shell Hook
 Gui +LastFound
 hWnd := WinExist()
-
 DllCall("RegisterShellHookWindow", UInt,hWnd)
 MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
