@@ -36,7 +36,6 @@ OnMessage(MsgNum, "ShellMessage")
 OnMessage(16687, "RainmeterWindowMessage")
 
 ShellMessage(wParam, lParam) {
-global AntimicroOutlookActive
 ; Execute a command based on wParam and lParam
   If (wParam = 2 OR wParam = 6) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
@@ -53,9 +52,7 @@ global AntimicroOutlookActive
 
     ; Update Antimicro for Outlook transitions
     OutlookActive := (currentProcess = "outlook.exe") AND WinActive("Inbox ahk_id" . lParam . " ahk_exe Outlook.exe")
-    If (OutlookActive <> AntimicroOutlookActive) {
-	    UpdateAntimicro(OutlookActive)
-    }
+    UpdateAntimicro(OutlookActive)
   }
 }
 
@@ -63,10 +60,13 @@ AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
 AntimicroExists := FileExist(AntimicroPath)
 
 UpdateAntimicro(outlookActive) {
-  global AntimicroPath, AntimicroExists, AntimicroOutlookActive
-  profileName := outlookActive ? "Outlook" : "Mouse"
-  Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
-  AntimicroOutlookActive := outlookActive
+  global AntimicroPath, AntimicroExists
+  static AntimicroOutlookActive
+  if (outlookActive <> AntimicroOutlookActive) {
+    profileName := outlookActive ? "Outlook" : "Mouse"
+    Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
+    AntimicroOutlookActive := outlookActive
+  }
 }
 
 RainmeterPath := "C:\Program Files\Rainmeter\rainmeter.exe"
