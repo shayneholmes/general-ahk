@@ -235,9 +235,9 @@ return
 #c::Send !{F12} ; reset partial count
 #IfWinActive
 
-#IfWinActive ahk_class TscShellContainerClass ; RDP window
+#IfWinActive ahk_class TscShellContainerClass ; RDP/MSTSC window
 
-^!b::
+^!f::
 PlaceTooltip("RDP: Toggling fullscreen.")
 Send ^!{CtrlBreak}
 return
