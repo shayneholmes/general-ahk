@@ -673,16 +673,16 @@ F17::Send ∞
 
 F24:: ;plover launch
 LaunchPlover:
-If (!WinExist("Plover ahk_class wxWindowClassNR")) {
+If (!WinExist("Plover ahk_class wxWindowNR")) {
   PlaceToolTip("No Plover found; launching...", , 3000)
   Run, ..\Plover\plover.exe
-  WinWait, Plover ahk_class wxWindowClassNR, , 15
+  WinWait, Plover ahk_class wxWindowNR, , 15
 }
 return
 
 +F24:: ;plover re-launch
 +F23:: ;plover re-launch
-If (WinExist("Plover ahk_class wxWindowClassNR")) {
+If (WinExist("Plover ahk_class wxWindowNR")) {
   WinClose,,,5
 }
 Goto LaunchPlover
@@ -749,18 +749,18 @@ SetErgodoxConnected()
 
 UpdatePloverWindowStatus() {
 ; Update Rainmeter
-WinGetTitle, PloverTitle, ahk_class wxWindowClassNR ahk_exe plover.exe
+WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
 If ((PloverLastStatus != -1) and InStr(PloverTitle, ": running")) {
   PloverLastStatus := -1
-  SendRainmeterCommand("[!SetVariable PloverStatus -1][!Update]")
+  SendRainmeterCommand("[!SetVariable StatusBubble -1][!Update]")
 }
 Else If ((PloverLastStatus != 1) and InStr(PloverTitle, ": stopped")) {
   PloverLastStatus := 1
-  SendRainmeterCommand("[!SetVariable PloverStatus 1][!Update]")
+  SendRainmeterCommand("[!SetVariable StatusBubble 1][!Update]")
 }
 Else If (PloverTitle = "") {
   PloverLastStatus := 0
-  SendRainmeterCommand("[!SetVariable PloverStatus 0][!Update]")
+  SendRainmeterCommand("[!SetVariable StatusBubble 0][!Update]")
 }
 }
 
