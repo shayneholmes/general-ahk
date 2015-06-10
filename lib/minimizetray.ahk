@@ -77,6 +77,11 @@ else
 Goto MinimizeTray_SkipHotkeyLabelsToContinueAutoExecSection
 
 mwt_Minimize:
+HideWindow()
+return
+
+HideWindow(descriptor = "A") {
+global
 if mwt_WindowCount >= %mwt_MaxWindows%
 {
 	MsgBox No more than %mwt_MaxWindows% may be hidden simultaneously.
@@ -86,7 +91,7 @@ if mwt_WindowCount >= %mwt_MaxWindows%
 ; Set the "last found window" to simplify and help performance.
 ; Since in certain cases it is possible for there to be no active window,
 ; a timeout has been added:
-WinWait, A,, 2
+WinWait, %descriptor%,, 2
 if ErrorLevel <> 0  ; It timed out, so do nothing.
 	return
 
@@ -103,7 +108,10 @@ if mwt_ActiveClass in Shell_TrayWnd,Progman
 ; beneath this one (if any). I tried other ways, but they wound up
 ; activating the task bar.  This way sends the active window (which is
 ; about to be hidden) to the back of the stack, which seems best:
-Send, !{esc}
+IfWinActive
+{
+    Send, !{esc}
+}
 ; Hide it only now that WinGetTitle/WinGetClass above have been run (since
 ; by default, those commands cannot detect hidden windows):
 WinHide
@@ -177,8 +185,7 @@ if mwt_AlreadyExists = n
 		}
 	}
 }
-return
-
+}
 
 RestoreFromTrayMenu:
 Menu, Tray, delete, %A_ThisMenuItem%

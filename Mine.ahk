@@ -721,3 +721,19 @@ Else If (PloverTitle = "") {
   SendRainmeterCommand("[!SetVariable PloverStatus 0][!Update]")
 }
 }
+
+#c::
+WinGetTitle, Title, Google Play Music
+PlaceToolTip(Title)
+return
+
+BeepPcSpeakers() {
+SoundBeep 400, 40
+SoundBeep 800, 40 
+; SoundBeep 400
+}
+
+F13::
+PlaceToolTip("Productivity mode")
+HideWindow("Google Chrome")
+return
