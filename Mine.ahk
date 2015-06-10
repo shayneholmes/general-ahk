@@ -37,6 +37,8 @@ OnMessage(16687, "RainmeterWindowMessage")
 
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
+;    WinGet, currentProcess, ProcessName, ahk_id %lParam%
+;    PlaceToolTip("Window event: " wParam " on " currentProcess)
   If (wParam = 2 OR wParam = 6) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
     ; PlaceToolTip("Window redrawn: " . currentProcess)
@@ -46,7 +48,7 @@ ShellMessage(wParam, lParam) {
       UpdatePloverWindowStatus()
     }
   }
-  If (wParam = 4) { ; HSHELL_WINDOWACTIVATED
+  If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
     ; PlaceToolTip("Window activated: " . currentProcess)
 
@@ -64,7 +66,9 @@ UpdateAntimicro(outlookActive) {
   static AntimicroOutlookActive
   if (outlookActive <> AntimicroOutlookActive) {
     profileName := outlookActive ? "Outlook" : "Mouse"
-    Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
+    if (AntimicroExists) {
+      Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
+    }
     AntimicroOutlookActive := outlookActive
   }
 }
@@ -76,17 +80,17 @@ SendRainmeterCommand(Command) {
   global RainmeterPath, RainmeterExists
   if (RainmeterExists) {
     Run, %RainmeterPath% %Command%
+    ; PlaceTooltip("Send Rainmeter: " Command)
   }
 }
 
 RainmeterWindowMessage(wParam, lParam) { 
-  global TimerUnderway
+  global TimerActive
   If (wParam = 0) { ; new timer
-    TimerUnderway = 0
-    SetTimer(lParam, false)
-  } Else If (wParam = 1) { ; timer ended
-    TimerUnderway = 1
-    SetTimer(lParam, false)
+    TimerActive = 0
+    StartTimer(lParam, false)
+  } Else If (wParam = 1) { ; timer ended and we didn't start it
+    CancelTimer(false)
   }
 }
 
@@ -323,7 +327,7 @@ RegExMatch(Title, "(\w+)\.ini", SubPat)
 If (SubPat <> "") {
 PlaceTooltip("Reloading rainmeter skin " . SubPat1 . "...")
 send ^s ; save the script
-SendRainmeterCommand("[!Refresh %SubPat1%]")
+SendRainmeterCommand("[!Refresh " . SubPat1 . "]")
 }
 return
 
@@ -562,59 +566,80 @@ return
 SetTimer(15*60)
 return
 
-SetTimer(Seconds, FromAHK = true)
+SetTimer(Seconds) {
+  global TimerActive
+  if (not TimerActive) {
+    StartTimer(Seconds, true)
+  } else {
+    CancelTimer(true)
+  }
+}
+
+StartTimer(Seconds, EventFromAHK = true)
 {
-  Color   := "4,192,64,255"
-  TimerCount = 0
-  If (Seconds = 15*60) {
-    Color   := "255,0,0,255"
-    TimerCount = 1
-  } Else If (Seconds = 5*60) {
-    Color   := "96,96,128,255"
-  }
+  global TimerActive
+  global TimerStartedTime
+  global TimerStartedFromAHK
 
-  If (mod(Seconds,60) = 0) {
-    PrettyTime := Seconds // 60 . " minutes"
-  } Else {
-    PrettyTime := Seconds . " seconds"
-  }
-
-    global TimerUnderway
-    global TimerStarted
-    if (not TimerUnderway) {
-            TimerStarted := A_TickCount
-            If (FromAHK) {
-              PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
-              SoundPlay, alarmstart.wav
-              SendRainmeterCommand("[!SetVariable ActiveTimerCount %TimerCount%][!SetVariable TimerDuration %Seconds%][!Update][!SetVariable ColorTimerArc %Color% ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update]")
-              delay := -1000*Seconds
-              SetTimer, TimerEnd, %delay%
-            } else {
-              SetTimer, TimerEnd, off
-            }
-            TimerUnderway = 1
-            Menu, Tray, Icon, timer.ico
-    } else {
-            If (FromAHK) {
-               SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update]")
-               SoundPlay, alarmcancel.wav
-               TimerEnded := A_TickCount
-               Duration := (TimerEnded - TimerStarted) / 1000
-               T = 20000101000000
-               T += Duration, Seconds
-               FormatTime FormdT, %T%, mm:ss
-               PlaceTooltip("Timer canceled after " . FormdT, , 3000)
-            }
-            SetTimer, TimerEnd, off
-            TimerUnderway = 0
-            Menu, Tray, Icon, icon.ico
+  TimerStartedTime := A_TickCount
+  If (EventFromAHK) {
+    Color   := "4,192,64,255"
+    TimerCount = 0
+    If (Seconds = 15*60) {
+      Color   := "255,0,0,255"
+      TimerCount = 1
+    } Else If (Seconds = 5*60) {
+      Color   := "96,96,128,255"
     }
+    If (mod(Seconds,60) = 0) {
+      PrettyTime := Seconds // 60 . " minutes"
+    } Else {
+      PrettyTime := Seconds . " seconds"
+    }
+    PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
+    SoundPlay, alarmstart.wav
+    SendRainmeterCommand("[!SetVariable ActiveTimerCount " TimerCount "][!SetVariable TimerDuration " Seconds "][!Update][!SetVariable ColorTimerArc " Color " ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update]")
+    delay := -1000*(Seconds)
+    SetTimer, TimerEnd, %delay%
+    TimerStartedFromAHK := true
+  } else { ; Rainmeter; cancel any existing AHK timer
+    SetTimer, TimerEnd, off
+    TimerStartedFromAHK := false
+  }
+  TimerActive = 1
+  Menu, Tray, Icon, timer.ico
+}
+
+CancelTimer(EventFromAHK = true) {
+  global TimerActive
+  global TimerStartedTime
+  global TimerStartedFromAHK
+  
+  If (EventFromAHK) { ; user-initiated cancel
+    SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update]")
+    SoundPlay, alarmcancel.wav
+    TimerEndedTime := A_TickCount
+    Duration := (TimerEndedTime - TimerStartedTime) / 1000
+    T = 20000101000000
+    T += Duration, Seconds
+    FormatTime FormdT, %T%, mm:ss
+    PlaceTooltip("Timer canceled after " . FormdT, , 3000)
+    SetTimer, TimerEnd, off
+  } else if (TimerStartedFromAHK){ ; Rainmeter finished one of ours early
+    return
+  }
+  TimerActive = 0
+  Menu, Tray, Icon, icon.ico
+  If (!IsMusicPlaying())
+    BeepPcSpeakers()
 }
 
 TimerEnd:
 PlaceTooltip("Time's up!", , 3000)
+If (!IsMusicPlaying())
+  BeepPcSpeakers()
 SoundPlay, alarmsound.wav
-TimerUnderway = 0
+TimerActive = 0
 Menu, Tray, Icon, icon.ico
 return
 
