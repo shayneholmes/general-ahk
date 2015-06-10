@@ -47,6 +47,10 @@ ShellMessage(wParam, lParam) {
       ; Plover update
       UpdatePloverWindowStatus()
     }
+    If (currentProcess = "launchy.exe") {
+      Process, Exist, Launchy.exe
+      LaunchyActive := (ErrorLevel != 0)
+    }
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
@@ -93,6 +97,11 @@ RainmeterWindowMessage(wParam, lParam) {
     CancelTimer(false)
   }
 }
+
+Process, Exist, Launchy.exe
+LaunchyActive := (ErrorLevel != 0)
+
+HtArray := -1
 
 ^/::
 ^?::
@@ -375,14 +384,22 @@ LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/
 
 #IfWinExist Launchy ahk_class QTool
 LWin::
-; SetTitleMatchMode 2
-; WinGet, Style, Style, A ; active window
-; if ((WinActive("Virtual Machine Connection") or WinActive("Remote Desktop Connection")) and (!(Style & 0x40000)))
-; {
-;    Send !{Home}
-; } else {
-    Send !{F10}
-; }
+;SetTitleMatchMode 2
+;WinGet, Style, Style, A ; active window
+;if ((WinActive("Virtual Machine Connection") or WinActive("Remote Desktop Connection")) and (!(Style & 0x40000)))
+;{
+;   Send !{Home}
+;} else {
+If (LaunchyActive) {
+  Send !{F10}
+  If (!WinExist("Launchy ahk_class QTool")) {
+    LaunchyActive := 0
+    Send {LWin}
+  }
+} Else { ; no Launchy
+  Send {LWin}
+}
+;}
 return
 
 #IfWinActive
