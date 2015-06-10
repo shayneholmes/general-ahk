@@ -493,12 +493,12 @@ Send +!{Home}
 return
 
 Media_Next::
-Send +!{PgDn}
+Send +^{PgDn}
 return
 
 +Media_Next::
 Media_Prev::
-Send +!{PgUp}
+Send +^{PgUp}
 return
 
 #IfWinActive
