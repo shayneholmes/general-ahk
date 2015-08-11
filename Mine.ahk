@@ -623,7 +623,7 @@ StartTimer(Seconds, EventFromAHK = true)
     }
     PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("[!SetVariable ActiveTimerCount " TimerCount "][!SetVariable TimerDuration " Seconds "][!Update][!SetVariable ColorTimerArc " Color " ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update]")
+    SendRainmeterCommand("[!SetVariable ActiveTimerCount " TimerCount "][!SetVariable TimerDuration " Seconds "][!Update MinimalTimer][!SetVariable ColorTimerArc " Color " ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update MinimalTimer]")
     delay := -1000*(Seconds)
     SetTimer, TimerEnd, %delay%
     TimerStartedFromAHK := true
@@ -641,7 +641,7 @@ CancelTimer(EventFromAHK = true) {
   global TimerStartedFromAHK
   
   If (EventFromAHK) { ; user-initiated cancel
-    SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update]")
+    SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update MinimalTimer]")
     SoundPlay, alarmcancel.wav
     TimerEndedTime := A_TickCount
     Duration := (TimerEndedTime - TimerStartedTime) / 1000
@@ -760,15 +760,15 @@ UpdatePloverWindowStatus() {
 WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
 If ((PloverLastStatus != -1) and InStr(PloverTitle, ": running")) {
   PloverLastStatus := -1
-  SendRainmeterCommand("[!SetVariable StatusBubble -1][!Update PloverStatus][!Update PloverStatus2]")
+  SendRainmeterCommand("[!SetVariable IndicatorState -1][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
 }
 Else If ((PloverLastStatus != 1) and InStr(PloverTitle, ": stopped")) {
   PloverLastStatus := 1
-  SendRainmeterCommand("[!SetVariable StatusBubble 1][!Update PloverStatus][!Update PloverStatus2]")
+  SendRainmeterCommand("[!SetVariable IndicatorState 1][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
 }
 Else If (PloverTitle = "") {
   PloverLastStatus := 0
-  SendRainmeterCommand("[!SetVariable StatusBubble 0][!Update PloverStatus][!Update PloverStatus2]")
+  SendRainmeterCommand("[!SetVariable IndicatorState 0][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
 }
 }
 
