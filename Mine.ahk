@@ -175,7 +175,10 @@ return
 #IfWinActive ahk_class Chrome_WidgetWin_1
 :oc:chtr::
 :oc:htr::
-Month := "July"
+Date := A_Now
+Date += -25, days
+FormatTime, Month, %Date%, MMMM
+; Month := "July" ; optional override
 If (HtArray == -1) { ; populate array
   HtArray := Object()
   Loop, read, htnames.txt
