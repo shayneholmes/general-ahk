@@ -240,6 +240,7 @@ return
 
 #IfWinActive WriteMonkey ; WriteMonkey
 #c::Send !{F12} ; reset partial count
+^p::Send ^ep ; bring up pomodoro window
 #IfWinActive
 
 #IfWinActive ahk_class TscShellContainerClass ; RDP/MSTSC window
@@ -786,3 +787,8 @@ F13::
 PlaceToolTip("Productivity mode")
 HideWindow("Google Chrome")
 return
+
+#IfWinActive FamilySearch Indexing
+Space::Tab
+Tab::Space
+#IfWinActive
