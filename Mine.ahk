@@ -172,8 +172,10 @@ SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
 return
 
+#IfWinActive ahk_class Chrome_WidgetWin_1
+:oc:chtr::
 :oc:htr::
-Month := "May"
+Month := "July"
 If (HtArray == -1) { ; populate array
   HtArray := Object()
   Loop, read, htnames.txt
@@ -186,7 +188,12 @@ If (HtArray == -1) { ; populate array
     HtArray.Insert(OneEntry)
   }
 }
-Index := HtArray._MinIndex()
+Index := HtArray.MinIndex()
+PlaceTooltip(HtArray.MaxIndex())
+If !(HtArray.MaxIndex() > 0) {
+  Send Done{!}
+  return
+}
 OneEntry := HtArray[Index]
 Name := OneEntry[1]
 LastName := OneEntry[2]
@@ -197,13 +204,13 @@ HomeTeachingGreeting =
 (
 {Tab}{Tab}Home teaching in %Month%?{Tab}Hey %Name%,
 
-It's that time of the month again{!} Which of your home teaching families did you visit in %Month%? I've got you listed as the home teacher of:
+It's that time of the month again: Which of your home teaching families did you visit in %Month%? I've got you listed as the home teacher of:
 
 %Families%
 
-Also, this month I'm trying to schedule some time to sit down with you for an interview. Will you let me know if you'd prefer Sundays or weeknights? I'm still trying to figure out particulars, but I'll get to you this week by phone to confirm a time (maybe this week, or sometime in the near future).
+Did any of your families have needs that we can help with? 
 
-Let me know if you have any questions{!}
+Let me know if you have any questions.
 
 Thanks,
 
@@ -211,7 +218,7 @@ Shayne
 
 )
 SetKeyDelay, 0, 5
-Send <%Email%>{Tab}
+Send %Email%{Tab}
 Sleep, 1000
 Send %HomeTeachingGreeting%
 HtArray.Remove(Index)
