@@ -57,7 +57,7 @@ ShellMessage(wParam, lParam) {
     ; PlaceToolTip("Window activated: " . currentProcess)
 
     ; Update Antimicro for Outlook transitions
-    OutlookActive := (currentProcess = "outlook.exe") AND WinActive("Inbox ahk_id" . lParam . " ahk_exe Outlook.exe")
+    OutlookActive := (currentProcess = "outlook.exe")
     UpdateAntimicro(OutlookActive)
   }
 }
