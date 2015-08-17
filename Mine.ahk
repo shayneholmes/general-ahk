@@ -333,11 +333,10 @@ $F7::Send ^+2
 ^s::
 send ^s ; save the script
 PlaceTooltip("Reloading script...")
-SetTimer,ReloadScript,1000
+SetTimer,ReloadScript,-1000
 return
 
 ReloadScript:
-SetTimer,ReloadScript,Off
 Reload
 return
 
@@ -544,7 +543,6 @@ return
 ;------------------
 ; Tooltip functions
 ToolTipOff:
-SetTimer,ToolTipOff,Off
 ToolTip
 return
 
@@ -564,7 +562,7 @@ PlaceTooltip(byref text, location="Screen", delay=1000)
 	}
 	ToolTip, % text, X, Y
 	if (delay > -1) {
-		SetTimer,ToolTipOff,%delay%
+		SetTimer,ToolTipOff,-%delay%
 	}
 }
 
