@@ -799,8 +799,8 @@ PlaceToolTip(Title)
 return
 
 BeepPcSpeakers() {
-SoundBeep 400, 40
-SoundBeep 800, 40 
+; SoundBeep 400, 40
+; SoundBeep 800, 40 
 ; SoundBeep 400
 }
 
