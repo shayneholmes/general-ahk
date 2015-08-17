@@ -101,6 +101,8 @@ RainmeterWindowMessage(wParam, lParam) {
 Process, Exist, Launchy.exe
 LaunchyActive := (ErrorLevel != 0)
 
+LaunchOrHidePlover()
+
 HtArray := -1
 
 ^/::
@@ -683,12 +685,7 @@ F16::Send α
 F17::Send ∞
 
 F24:: ;plover launch
-LaunchPlover:
-If (!WinExist("Plover ahk_class wxWindowNR")) {
-  PlaceToolTip("No Plover found; launching...", , 3000)
-  Run, ..\Plover\plover.exe
-  WinWait, Plover ahk_class wxWindowNR, , 15
-}
+LaunchPlover()
 return
 
 +F24:: ;plover re-launch
@@ -696,7 +693,7 @@ return
 If (WinExist("Plover ahk_class wxWindowNR")) {
   WinClose,,,5
 }
-Goto LaunchPlover
+LaunchPlover()
 return
 
 #^r:: ; Reload
@@ -757,6 +754,29 @@ SetErgodoxConnected()
     Hotkey, F10, Off
   }
 }
+
+LaunchOrHidePlover() {
+If (!WinExist("Plover ahk_class wxWindowNR")) {
+  LaunchPlover()
+} else {
+  SetTimer, HidePlover, 0
+}
+}
+
+LaunchPlover() {
+If (!WinExist("Plover ahk_class wxWindowNR")) {
+  PlaceToolTip("No Plover found; launching...", , 3000)
+  Run, ..\Plover\plover.exe
+  WinWait, Plover ahk_class wxWindowNR, , 25
+  SetTimer, HidePlover, -2000
+}
+}
+
+HidePlover:
+If (WinExist("Plover ahk_class wxWindowNR")) {
+  HideWindow("Plover ahk_class wxWindowNR")
+}
+return
 
 UpdatePloverWindowStatus() {
 ; Update Rainmeter
