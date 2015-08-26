@@ -141,6 +141,15 @@ Ctrl+Alt+E: Toggle extensions
 PlaceTooltip(HelpText, ,5000)
 return
 
+#IfWinActive LCWO ; cancel these hotstrings when I'm practicing Morse code
+
+:b0:nd::
+:b0:td::
+:b0:yd::
+:b0:ts::
+:b0:tt::
+return
+
 #IfWinActive 
 
 /**
@@ -233,15 +242,6 @@ return
 
 #IfWinActive ResophNotes
 ^e::^f
-
-#IfWinActive LCWO ; cancel these hotstrings when I'm practicing Morse code
-
-:b0:nd::
-:b0:td::
-:b0:yd::
-:b0:ts::
-:b0:tt::
-return
 
 #IfWinActive WriteMonkey ; WriteMonkey
 #c::Send !{F12} ; reset partial count
