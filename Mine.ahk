@@ -757,7 +757,7 @@ LaunchOrHidePlover() {
 If (!WinExist("Plover ahk_class wxWindowNR")) {
   LaunchPlover()
 } else {
-  SetTimer, HidePlover, 0
+  SetTimer, HidePlover, -10
 }
 }
 
