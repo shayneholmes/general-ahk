@@ -529,11 +529,50 @@ PlaceTooltip("Window " . (winistop ? "" : "no longer ") . "on top (Ctrl+Alt+A)",
 return
 
 ^!b::
-Winset, Style, ^0xC00000, A
-WinGet, ExStyle, ExStyle, A
-winisborder := (ExStyle & 0xC00000) ; 0xC00000 is WS_CAPTION
+id := WinExist("A")
+
+Winset, Style, ^0xC00000, A ; WS_CAPTION
+WinGet, Style, Style, A
+winisborder := (Style & 0xC00000) ; 0xC00000 is WS_CAPTION
 PlaceTooltip("Window " . (winisborder ? "no longer " : "") . "unbordered (Ctrl+Alt+B)", "Window")
+
+; Toggle Sizebox only if it starts with Sizebox
+appwindowtoggle := (Style & 0x40000) || WinHasSizeBox_%id% ; WS_SizeBox
+if (appwindowtoggle) {
+  WinHasSizeBox_%id% := appwindowtoggle
+  WinSet, Style, ^0x40000, A ; WS_SizeBox
+  PlaceTooltip("Window has/had sizebox; state saved/restored", "Window")
+}
+
 return
+
+^!h:: ; Hide a window from the taskbar
+
+Send {LControl Up}{LAlt Up}
+; Setting Toolwindow is easy; we just assume that no windows have that set by default
+WinHide, A
+WinSet, ExStyle, ^0x80, A ; WS_EX_TOOLWINDOW
+WinGet, ExStyle, ExStyle, A
+winisvisible := (ExStyle & 0x80) ; WS_EX_TOOLWINDOW
+PlaceTooltip("Window " . (winisvisible ? "" : "no longer ") . "hidden from the taskbar and alt-tab list(Ctrl+Alt+H)", "Window")
+
+; Setting AppWindow appropriately is harder and requires state
+id := WinExist("A")
+appwindowtoggle := (ExStyle & 0x40000) || WinIsAppWindow_%id% ; WS_EX_APPWINDOW
+if (appwindowtoggle) {
+  WinIsAppWindow_%id% := appwindowtoggle
+  WinSet, ExStyle, ^0x40000, A ; WS_EX_APPWINDOW
+  PlaceTooltip("Window was/is app window; state saved/restored", "Window")
+}
+
+WinShow, A
+return
+
+^!c::
+WinGet, ExStyle, ExStyle, A
+WinGet, Style, Style, A
+PlaceTooltip("Window style: " . ExStyle . ", " . Style)
+return 
 
 ^!v::
 clipboard=%clipboard%
