@@ -114,7 +114,7 @@ AHK hotkeys
 td: Today's Date (Friday, 29 March 2013)
 yd: Yesterday's Date (Thursday, 28 March 2013)
 ts: TimeStamp (2013-03-29)
-tt: Today+Time (2013-05-28@11:53)
+tt: Today+Time (2013-05-28T11-53)
 
 LWin: Show Launchy (Alt+F10)
 Win+T: Set/cancel timer (15 by default, ctrl=2, shift=5)
@@ -176,8 +176,8 @@ SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
 return
 
-::tt:: ; 2013-05-28@11:53 (kinda ISO standard)
-FormatTime, CurrentDateTime,, yyyy-MM-dd@HH:mm
+::tt:: ; 2013-05-28T11-53 (kinda ISO standard)
+FormatTime, CurrentDateTime,, yyyy-MM-ddTHH-mm
 ; FormatTime, CurrentDateTime,, dddd, d MMMM yyyy hh:mm tt
 SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
