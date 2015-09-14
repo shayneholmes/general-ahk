@@ -120,7 +120,8 @@ LWin: Show Launchy (Alt+F10)
 Win+T: Set/cancel timer (15 by default, ctrl=2, shift=5)
 
 Ctrl+Alt+A: Window on top
-Ctrl+Alt+B: Toggle window border
+Ctrl+Alt+B: Hide window border
+Ctrl+Alt+H: Hide window from taskbar
 Win+Shift+R: Restore all windows
 Win+H: Hide current window
 Win+U: Unhide window
