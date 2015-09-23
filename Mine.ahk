@@ -431,7 +431,7 @@ return
  * Left-handed lock on Dvorak
  */
 #o::
-{
+LockWorkstation() {
 if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
   MB_PlayPause()
 }
@@ -443,7 +443,6 @@ DllCall("LockWorkStation")
 Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
-return
 
 ; Hook into next/prev if MPC is up and running
 #IfWinExist ahk_class MediaPlayerClassicW
