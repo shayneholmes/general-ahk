@@ -35,6 +35,12 @@ MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
 OnMessage(16687, "RainmeterWindowMessage")
 
+; Set up foot pedal commands
+AHKHID_UseConstants()
+OnMessage(0x00FF, "InputMsg") ; Intercept WM_INPUT
+AHKHID_Register(12, 1, hWnd, 256) ; RIDEV_INPUTSINK
+PlaceTooltip("Set up foot pedal. Window: " . hWnd)
+
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
 ;    WinGet, currentProcess, ProcessName, ahk_id %lParam%
@@ -862,3 +868,32 @@ return
 Space::Tab
 Tab::Space
 #IfWinActive
+
+InputMsg(wParam, lParam) { ; Handle foot pedal events
+    Local r, h
+    Static footPedalLastState := 0
+    Static FootPedalButtons := [4, 2, 1]
+    Critical    ;Or otherwise you could get ERROR_INVALID_HANDLE
+    
+    ;Get device type
+    r := AHKHID_GetInputInfo(lParam, II_DEVTYPE) 
+    If (r = -1)
+        OutputDebug %ErrorLevel%
+    Else If (r = RIM_TYPEHID){
+        h := AHKHID_GetInputInfo(lParam, II_DEVHANDLE)
+        if (   AHKHID_GetDevInfo(h, DI_HID_VENDORID, True) = 1972
+            && AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,True) = 536) { ; is my foot pedal
+            r := AHKHID_GetInputData(lParam, uData)
+            if (r = 9) { ; it should always be 9 bytes back, just checking
+              footPedalState := (*(&uData+3))
+              for k, v in FootPedalButtons {
+                if (footPedalState & ~footPedalLastState & v) {
+                  PlaceToolTip("Button " . k . " pressed.")
+                  LockWorkStation()
+                }
+              }
+              footPedalLastState := footPedalState
+            }
+        }
+    }
+}
