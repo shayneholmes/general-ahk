@@ -415,6 +415,16 @@ If (LaunchyActive) {
 ;}
 return
 
+#IfWinExist ahk_exe Executor.exe
+LWin::
+Send ^!+#w
+return
+
+#IfWinExist ahk_exe Wox.exe
+LWin::
+Send ^!+#w
+return
+
 #IfWinActive
 
 /**
