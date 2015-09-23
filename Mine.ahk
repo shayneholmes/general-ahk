@@ -39,7 +39,6 @@ OnMessage(16687, "RainmeterWindowMessage")
 AHKHID_UseConstants()
 OnMessage(0x00FF, "InputMsg") ; Intercept WM_INPUT
 AHKHID_Register(12, 1, hWnd, 256) ; RIDEV_INPUTSINK
-PlaceTooltip("Set up foot pedal. Window: " . hWnd)
 
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
@@ -445,7 +444,7 @@ else if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try t
     Send +!{Home}
 }
 Sleep, 200 ; wait for Win key to lift
-DllCall("LockWorkStation")
+DllCall("LockWorkstation")
 Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
@@ -888,12 +887,22 @@ InputMsg(wParam, lParam) { ; Handle foot pedal events
               footPedalState := (*(&uData+3))
               for k, v in FootPedalButtons {
                 if (footPedalState & ~footPedalLastState & v) {
-                  PlaceToolTip("Button " . k . " pressed.")
-                  LockWorkStation()
+                  ; PlaceToolTip("Button " . k . " pressed.")
+                  FootPedalButtonPressed(k)
                 }
               }
               footPedalLastState := footPedalState
             }
         }
     }
+}
+
+FootPedalButtonPressed(k = 0) {
+  If (k = 1) { ; left button
+    LockWorkStation()
+  } Else if (k = 2) { ; center buttonIronCapMount10
+  
+  } Else if (k = 3) { ; right button
+    SoundBeep, 800, 50
+  }
 }
