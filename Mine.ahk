@@ -436,7 +436,7 @@ return
  * Left-handed lock on Dvorak
  */
 #o::
-LockWorkstation() {
+LockWorkStation() {
 if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
   MB_PlayPause()
 }
@@ -444,7 +444,7 @@ else if (IsMusicPlaying() && WinExist("ahk_class Chrome_WidgetWin_1")) { ; try t
     Send +!{Home}
 }
 Sleep, 200 ; wait for Win key to lift
-DllCall("LockWorkstation")
+DllCall("LockWorkStation")
 Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
