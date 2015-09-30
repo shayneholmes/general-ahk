@@ -924,9 +924,9 @@ InputMsg(wParam, lParam) { ; Handle foot pedal events
 
 FootPedalButtonPressed(k = 0) {
   If (k = 1) { ; left button
-    LockWorkStation()
+    SoundBeep, 600, 50
   } Else if (k = 2) { ; center buttonIronCapMount10
-  
+    SoundBeep, 400, 50
   } Else if (k = 3) { ; right button
     SoundBeep, 800, 50
   }
