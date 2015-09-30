@@ -858,9 +858,34 @@ BeepPcSpeakers() {
 ; SoundBeep 400
 }
 
-F13::
-PlaceToolTip("Productivity mode")
-HideWindow("Google Chrome")
++F13::MouseClickTurboToggle(true) ; shift Space invader key
+
+F13:: ; Space invader key
+MouseClickTurboToggle(autoclick = false) {
+  global MouseClickTurbo 
+  MouseClickTurbo := !MouseClickTurbo
+  If (!MouseClickTurbo) {
+    SetTimer, MouseClickTurboClick, Off
+  }
+  If (MouseClickTurbo && autoclick) {
+    SetTimer, MouseClickTurboClick, 20
+  }
+  PlaceToolTip("Mouse click turbo mode " . (MouseClickTurbo ? "on" : "off"), "Cursor")
+}
+
+#If MouseClickTurbo = true
+
+LButton::
+Click
+SetTimer, MouseClickTurboClick, 20
+return
+
+LButton Up::
+SetTimer, MouseClickTurboClick, Off
+return
+
+MouseClickTurboClick:
+Click
 return
 
 #IfWinActive FamilySearch Indexing
