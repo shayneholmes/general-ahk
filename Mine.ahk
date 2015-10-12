@@ -196,7 +196,7 @@ Date := A_Now
 Date += -25, days
 FormatTime, Month, %Date%, MMMM
 ; Month := "July" ; optional override
-If (HtArray == -1) { ; populate array
+If (HtArray == -1) { ; populate array on first use
   HtArray := Object()
   Loop, read, htnames.txt
   {
@@ -224,13 +224,11 @@ HomeTeachingGreeting =
 (
 {Tab}{Tab}Home teaching in %Month%?{Tab}Hey %Name%,
 
-It's that time of the month again: Which of your home teaching families did you visit in %Month%? I've got you listed as the home teacher of:
+It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, you're the home teacher of:
 
 %Families%
 
-Did any of your families have needs that we can help with? 
-
-Let me know if you have any questions.
+Did any of your families have needs that we can help with?
 
 Thanks,
 
