@@ -89,7 +89,7 @@ SendRainmeterCommand(Command) {
   global RainmeterPath, RainmeterExists
   if (RainmeterExists) {
     Run, %RainmeterPath% %Command%
-    ; PlaceTooltip("Send Rainmeter: " Command)
+    PlaceTooltip("Send Rainmeter: " Command, 5000)
   }
 }
 
@@ -678,7 +678,7 @@ StartTimer(Seconds, EventFromAHK = true)
     }
     PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("[!SetVariable ActiveTimerCount " TimerCount "][!SetVariable TimerDuration " Seconds "][!Update MinimalTimer][!SetVariable ColorTimerArc " Color " ][!EnableMeasure MeasureStartTimerAPIBang MinimalTimer][!Update MinimalTimer]")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds // 60 "','" Color "'," TimerCount ")"" TimerRework")
     delay := -1000*(Seconds)
     SetTimer, TimerEnd, %delay%
     TimerStartedFromAHK := true
@@ -696,7 +696,7 @@ CancelTimer(EventFromAHK = true) {
   global TimerStartedFromAHK
   
   If (EventFromAHK) { ; user-initiated cancel
-    SendRainmeterCommand("[SetVariable ActiveTimerCount 0][!SetVariable TimerEndOfTimer 0][!Update MinimalTimer]")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('0','0','0')"" TimerRework")
     SoundPlay, alarmcancel.wav
     TimerEndedTime := A_TickCount
     Duration := (TimerEndedTime - TimerStartedTime) / 1000
@@ -846,8 +846,7 @@ Else If (PloverTitle = "") {
 }
 
 #c::
-WinGetTitle, Title, Google Play Music
-PlaceToolTip(Title)
+SendRainmeterCommand("[!CommandMeasure ""MeasureTimerScript"" ""ChangeVar()""]")
 return
 
 BeepPcSpeakers() {
@@ -876,6 +875,7 @@ MouseClickTurboToggle(autoclick = false) {
 LButton::
 Click
 SetTimer, MouseClickTurboClick, 20
+MouseClickTurboActive := True
 return
 
 LButton Up::
