@@ -833,15 +833,15 @@ UpdatePloverWindowStatus() {
 WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
 If ((PloverLastStatus != -1) and InStr(PloverTitle, ": running")) {
   PloverLastStatus := -1
-  SendRainmeterCommand("[!SetVariable IndicatorState -1][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
+  SendRainmeterCommand("[!SetVariable IndicatorState -1][!Update PloverStatus]")
 }
 Else If ((PloverLastStatus != 1) and InStr(PloverTitle, ": stopped")) {
   PloverLastStatus := 1
-  SendRainmeterCommand("[!SetVariable IndicatorState 1][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
+  SendRainmeterCommand("[!SetVariable IndicatorState 1][!Update PloverStatus]")
 }
 Else If (PloverTitle = "") {
   PloverLastStatus := 0
-  SendRainmeterCommand("[!SetVariable IndicatorState 0][!Update PloverStatus][!Update PloverStatus2][!Update PloverStatus3]")
+  SendRainmeterCommand("[!SetVariable IndicatorState 0][!Update PloverStatus]")
 }
 }
 
