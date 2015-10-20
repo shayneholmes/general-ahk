@@ -89,7 +89,7 @@ SendRainmeterCommand(Command) {
   global RainmeterPath, RainmeterExists
   if (RainmeterExists) {
     Run, %RainmeterPath% %Command%
-    PlaceTooltip("Send Rainmeter: " Command, 5000)
+    ; PlaceTooltip("Send Rainmeter: " Command, 5000)
   }
 }
 
@@ -678,7 +678,7 @@ StartTimer(Seconds, EventFromAHK = true)
     }
     PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds // 60 "','" Color "'," TimerCount ")"" TimerRework")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" TimerRework")
     delay := -1000*(Seconds)
     SetTimer, TimerEnd, %delay%
     TimerStartedFromAHK := true
@@ -694,9 +694,9 @@ CancelTimer(EventFromAHK = true) {
   global TimerActive
   global TimerStartedTime
   global TimerStartedFromAHK
-  
+
   If (EventFromAHK) { ; user-initiated cancel
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('0','0','0')"" TimerRework")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('-1','0','0')"" TimerRework")
     SoundPlay, alarmcancel.wav
     TimerEndedTime := A_TickCount
     Duration := (TimerEndedTime - TimerStartedTime) / 1000
