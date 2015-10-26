@@ -98,7 +98,7 @@ RainmeterWindowMessage(wParam, lParam) {
   If (wParam = 0) { ; new timer
     TimerActive = 0
     StartTimer(lParam, false)
-  } Else If (wParam = 1) { ; timer ended and we didn't start it
+  } Else If (wParam = 1) { ; timer ended (one we didn't start)
     CancelTimer(false)
   }
 }
@@ -678,7 +678,7 @@ StartTimer(Seconds, EventFromAHK = true)
     }
     PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" TimerRework")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
     delay := -1000*(Seconds)
     SetTimer, TimerEnd, %delay%
     TimerStartedFromAHK := true
@@ -696,7 +696,7 @@ CancelTimer(EventFromAHK = true) {
   global TimerStartedFromAHK
 
   If (EventFromAHK) { ; user-initiated cancel
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('-1','0','0')"" TimerRework")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('-1','0','0')"" MinimalTimer")
     SoundPlay, alarmcancel.wav
     TimerEndedTime := A_TickCount
     Duration := (TimerEndedTime - TimerStartedTime) / 1000
@@ -705,8 +705,6 @@ CancelTimer(EventFromAHK = true) {
     FormatTime FormdT, %T%, mm:ss
     PlaceTooltip("Timer canceled after " . FormdT, , 3000)
     SetTimer, TimerEnd, off
-  } else if (TimerStartedFromAHK){ ; Rainmeter finished one of ours early
-    return
   }
   TimerActive = 0
   Menu, Tray, Icon, icon.ico
