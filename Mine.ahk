@@ -168,6 +168,9 @@ SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
 return
 
+:b0?:/yd:: ; I bump into this when typing prices per yard of fabric ($25/yd)
+return
+
 ::yd:: ; 1 day ago, for journaling
 today = %a_now%
 today += -1, days
