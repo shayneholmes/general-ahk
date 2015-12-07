@@ -100,6 +100,8 @@ RainmeterWindowMessage(wParam, lParam) {
     StartTimer(lParam, false)
   } Else If (wParam = 1) { ; timer ended (one we didn't start)
     CancelTimer(false)
+  } Else If (wParam = 2) { ; check MusicBee for play count and report back
+    CheckMusicBeePlayCount()
   }
 }
 
@@ -723,6 +725,12 @@ SoundPlay, alarmsound.wav
 TimerActive = 0
 Menu, Tray, Icon, icon.ico
 return
+
+CheckMusicBeePlayCount() {
+  PlayCount := MB_GetFileProperty(MBFP_PlayCount)
+  ; PlaceToolTip("PlayCount: " . PlayCount)
+  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " . PlayCount . "][!Update NowPlaying]")
+}
 
 ; Ergodox functionality
 
