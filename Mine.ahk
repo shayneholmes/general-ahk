@@ -752,19 +752,6 @@ PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
 
-#e:: ; Substitute FreeCommander for Explorer
-If WinExist("ahk_class FreeCommanderXE.SingleInst.1") {
-  WinActivate
-} else if FileExist("C:\Program Files (x86)\FreeCommander XE\FreeCommander.exe") {
-  Run, C:\Program Files (x86)\FreeCommander XE\FreeCommander.exe,,,pid
-  ; bring it to foreground when it launches
-  WinWait, ahk_pid %pid%
-  WinActivate, ahk_pid %pid%
-} else {
-  Run explorer.exe
-}
-return
-
 IsMusicPlaying() {
 audioMeter := VA_GetAudioMeter()
 
