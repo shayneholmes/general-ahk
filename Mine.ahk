@@ -736,7 +736,7 @@ return
 CheckMusicBeePlayCount() {
   PlayCount := MB_GetFileProperty(MBFP_PlayCount)
   ; PlaceToolTip("PlayCount: " . PlayCount)
-  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " . PlayCount . "][!Update NowPlaying]")
+  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " . PlayCount . "][!UpdateMeasure mPlayCount NowPlaying]")
 }
 
 ; Ergodox functionality
