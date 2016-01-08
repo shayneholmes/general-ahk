@@ -236,7 +236,7 @@ HomeTeachingGreeting =
 (
 {Tab}{Tab}Home teaching in %Month%?{Tab}Hey %Name%,
 
-It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, you're the home teacher of:
+Happy new year{!} It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, you're the home teacher of:
 
 %Families%
 
