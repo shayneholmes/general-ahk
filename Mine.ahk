@@ -459,6 +459,23 @@ Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
 
+; Sign out (hit it twice)
+#+o::
+if (SignOutStarted <> 1) {
+  PlaceTooltip("Sign-out started; press it again to do it...")
+  SignOutStarted := 1
+  SetTimer,ResetSignOut,-1500
+} else {
+  SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
+  PlaceTooltip("Signing out...")
+  Shutdown, 0
+}
+return
+
+ResetSignOut:
+SignOutStarted = 0
+return
+
 ; Hook into next/prev if MPC is up and running
 #IfWinExist ahk_class MediaPlayerClassicW
 
