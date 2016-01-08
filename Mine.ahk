@@ -766,6 +766,9 @@ F15::Send λ
 F16::Send α
 +F16::Send Α
 F17::Send ∞
+^+8::Send ×
++NumpadMult::Send ×
+F18::Send ×
 
 F24:: ;plover launch
 LaunchPlover()
