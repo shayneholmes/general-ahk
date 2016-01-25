@@ -435,7 +435,7 @@ LWin::
 Send ^!+#w
 return
 
-#IfWinExist ahk_exe Wox.exe
+#IfWinExist Wox ahk_exe Wox.exe
 LWin::
 Send ^!+#w
 return
