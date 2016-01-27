@@ -16,7 +16,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 SetTitleMatchMode 2 ; for #ifwinnotactive calls
 DetectHiddenWindows, on
-Menu, Tray, Icon, icon.ico ; set tray icon
+IconStateArray := {timer: false, plover: false} ; set precedence for icons
+UpdateIcon()
 
 #Include lib
 #Include minimizetray.ahk
@@ -716,7 +717,7 @@ StartTimer(Seconds, EventFromAHK = true)
     TimerStartedFromAHK := false
   }
   TimerActive = 1
-  Menu, Tray, Icon, timer.ico
+  SetIconState("timer", true)
 }
 
 CancelTimer(EventFromAHK = true) {
@@ -736,7 +737,7 @@ CancelTimer(EventFromAHK = true) {
     SetTimer, TimerEnd, off
   }
   TimerActive = 0
-  Menu, Tray, Icon, icon.ico
+  SetIconState("timer", false)
   If (!IsMusicPlaying())
     BeepPcSpeakers()
 }
@@ -747,7 +748,7 @@ If (!IsMusicPlaying())
   BeepPcSpeakers()
 SoundPlay, alarmsound.wav
 TimerActive = 0
-Menu, Tray, Icon, icon.ico
+SetIconState("timer", false)
 return
 
 CheckMusicBeePlayCount() {
@@ -956,5 +957,26 @@ FootPedalButtonPressed(k = 0) {
     SoundBeep, 400, 50
   } Else if (k = 3) { ; right button
     SoundBeep, 800, 50
+  }
+}
+
+SetIconState(name, state) {
+  global IconStateArray
+  IconStateArray[name] := state
+  UpdateIcon()
+}
+
+UpdateIcon() {
+  global IconStateArray
+  iconFound := false
+  for key, value in IconStateArray {
+    if (value) {
+      Menu, Tray, Icon, %key%.ico, , 1 ; freeze
+      iconFound := true
+      break
+    }
+  }
+  if (!iconFound) {
+    Menu, Tray, Icon, icon.ico
   }
 }
