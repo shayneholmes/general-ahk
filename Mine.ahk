@@ -30,11 +30,14 @@ Process, Priority,, High
 
 ; Shell Hook
 Gui +LastFound
-hWnd := WinExist()
+hWnd := WinExist("Mine ahk_class AutoHotkey")
 DllCall("RegisterShellHookWindow", UInt,hWnd)
 MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
 OnMessage(16687, "RainmeterWindowMessage")
+
+; allow message from non-elevated Rainmeter window
+DllCall("ChangeWindowMessageFilterEx", Ptr, hWnd, Uint, 16687, Uint, MSGFLT_ALLOW := 1, ptr, 0)
 
 ; Set up foot pedal commands
 AHKHID_UseConstants()
@@ -56,9 +59,6 @@ ShellMessage(wParam, lParam) {
     Else if (currentProcess = "launchy.exe") {
       Process, Exist, Launchy.exe
       LaunchyActive := (ErrorLevel != 0)
-    }
-    Else if (currentProcess = "MusicBee.exe") {
-      CheckMusicBeePlayCount()
     }
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
