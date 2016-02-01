@@ -202,13 +202,26 @@ SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
 return
 
+:oc:htrt:: ; Test home teaching stuff
+Loop {
+  PlaceTooltip(HtArray.MaxIndex())
+  OneHomeTeaching(true)
+} Until (!HtArray.MaxIndex())
+return
+
 #IfWinActive ahk_class Chrome_WidgetWin_1
 :oc:chtr::
 :oc:htr::
+OneHomeTeaching()
+return
+
+OneHomeTeaching(test = false) {
+Global HtArray
 Date := A_Now
 Date += -25, days
 FormatTime, Month, %Date%, MMMM
 ; Month := "July" ; optional override
+; SeasonalGreeting := "Happy New Year {!} " ; optional seasonal stuff
 If (HtArray == -1) { ; populate array on first use
   HtArray := Object()
   Loop, read, htnames.txt
@@ -222,7 +235,6 @@ If (HtArray == -1) { ; populate array on first use
   }
 }
 Index := HtArray.MinIndex()
-PlaceTooltip(HtArray.MaxIndex())
 If !(HtArray.MaxIndex() > 0) {
   Send Done{!}
   return
@@ -232,12 +244,13 @@ Name := OneEntry[1]
 LastName := OneEntry[2]
 Email := OneEntry[3]
 Families := OneEntry[4]
-StringReplace, Families, Families, /, `n
+StringReplace, Families, Families, /, `n, All
+
 HomeTeachingGreeting = 
 (
 {Tab}{Tab}Home teaching in %Month%?{Tab}Hey %Name%,
 
-Happy new year{!} It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, you're the home teacher of:
+%SeasonalGreeting%It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, you're the home teacher of:
 
 %Families%
 
@@ -248,12 +261,20 @@ Thanks,
 Shayne
 
 )
-SetKeyDelay, 0, 5
+if (!test) {
+  OldDelay := A_KeyDelay
+  SetKeyDelay, 5
+}
 Send %Email%{Tab}
-Sleep, 1000
+if (!test) {
+  Sleep, 1000
+}
 Send %HomeTeachingGreeting%
 HtArray.Remove(Index)
-return
+if (!test) {
+  SetKeyDelay, %OldDelay%
+}
+}
 
 ; App-specific hotkeys
 
