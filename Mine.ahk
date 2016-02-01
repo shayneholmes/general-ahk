@@ -53,9 +53,12 @@ ShellMessage(wParam, lParam) {
       ; Plover update
       UpdatePloverWindowStatus()
     }
-    If (currentProcess = "launchy.exe") {
+    Else if (currentProcess = "launchy.exe") {
       Process, Exist, Launchy.exe
       LaunchyActive := (ErrorLevel != 0)
+    }
+    Else if (currentProcess = "MusicBee.exe") {
+      CheckMusicBeePlayCount()
     }
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
