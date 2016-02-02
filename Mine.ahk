@@ -105,13 +105,12 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetWindowClass)  ; ByRef saves a l
 }
 
 RainmeterWindowMessage(wParam, lParam) { 
-  global TimerActive
-  If (wParam = 0) { ; new timer
-    TimerActive = 0
+  global TimerActiveStart
+  If (wParam = 0) { ; timer start
     StartTimer(lParam, false)
-  } Else If (wParam = 1) { ; timer ended (one we didn't start)
+  } Else If (wParam = 1) { ; timer end
     CancelTimer(false)
-  } Else If (wParam = 2) { ; check MusicBee for play count and report back
+  } Else If (wParam = 2) { ; track change
     CheckMusicBeePlayCount()
   }
 }
@@ -702,78 +701,60 @@ Loop, %id%
 Return
 
 #^t:: ; Set 2-minute timer
-SetTimer(2*60)
+StartTimer(2*60,, "4,192,64,255")
 return
 
 #+t:: ; Set 5-minute timer
-SetTimer(5*60)
+StartTimer(5*60,, "96,96,128,255")
 return
 
 #t:: ; Set 15-minute timer
-SetTimer(15*60)
+StartTimer(15*60,, "255,0,0,255", 1)
 return
 
-SetTimer(Seconds) {
-  global TimerActive
-  if (not TimerActive) {
-    StartTimer(Seconds, true)
-  } else {
-    CancelTimer(true)
-  }
-}
-
-StartTimer(Seconds, EventFromAHK = true)
+StartTimer(Seconds, EventFromAHK = true, Color = "4,192,64,255", TimerCount = 0)
 {
-  global TimerActive
-  global TimerStartedTime
-  global TimerStartedFromAHK
+  global TimerActiveStart
+  
+  if (TimerActiveStart and EventFromAHK) { ; cancel existing timer
+    CancelTimer(true)
+    return
+  }
 
-  TimerStartedTime := A_TickCount
+  TimerActiveStart := A_TickCount
   If (EventFromAHK) {
-    Color   := "4,192,64,255"
-    TimerCount = 0
-    If (Seconds = 15*60) {
-      Color   := "255,0,0,255"
-      TimerCount = 1
-    } Else If (Seconds = 5*60) {
-      Color   := "96,96,128,255"
-    }
     If (mod(Seconds,60) = 0) {
       PrettyTime := Seconds // 60 . " minutes"
     } Else {
-      PrettyTime := Seconds . " seconds"
+      T = 20000101000000
+      T += Seconds, Seconds
+      FormatTime PrettyTime, %T%, mm:ss
     }
     PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
     SoundPlay, alarmstart.wav
     SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
     delay := -1000*(Seconds)
     SetTimer, TimerEnd, %delay%
-    TimerStartedFromAHK := true
-  } else { ; Rainmeter; cancel any existing AHK timer
+  } else { ; Rainmeter started a new timer: cancel any existing AHK timer
     SetTimer, TimerEnd, off
-    TimerStartedFromAHK := false
   }
-  TimerActive = 1
   SetIconState("timer", true)
 }
 
 CancelTimer(EventFromAHK = true) {
-  global TimerActive
-  global TimerStartedTime
-  global TimerStartedFromAHK
+  global TimerActiveStart
 
   If (EventFromAHK) { ; user-initiated cancel
     SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('-1','0','0')"" MinimalTimer")
     SoundPlay, alarmcancel.wav
-    TimerEndedTime := A_TickCount
-    Duration := (TimerEndedTime - TimerStartedTime) / 1000
+    Duration := (A_TickCount - TimerActiveStart) / 1000
     T = 20000101000000
     T += Duration, Seconds
     FormatTime FormdT, %T%, mm:ss
     PlaceTooltip("Timer canceled after " . FormdT, , 3000)
     SetTimer, TimerEnd, off
   }
-  TimerActive = 0
+  TimerActiveStart = 0
   SetIconState("timer", false)
   If (!IsMusicPlaying())
     BeepPcSpeakers()
@@ -784,7 +765,7 @@ PlaceTooltip("Time's up!", , 3000)
 If (!IsMusicPlaying())
   BeepPcSpeakers()
 SoundPlay, alarmsound.wav
-TimerActive = 0
+TimerActiveStart = 0
 SetIconState("timer", false)
 return
 
