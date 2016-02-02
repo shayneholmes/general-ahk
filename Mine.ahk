@@ -17,7 +17,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetTitleMatchMode 2 ; for #ifwinnotactive calls
 DetectHiddenWindows, on
 IconStateArray := {timer: false, plover: false} ; set precedence for icons
-UpdateIcon()
+SetIconState()
 
 #Include lib
 #Include minimizetray.ahk
@@ -35,15 +35,25 @@ hWnd := WinExist("Mine ahk_class AutoHotkey")
 DllCall("RegisterShellHookWindow", UInt,hWnd)
 MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
-OnMessage(MESSAGE_RAINMETER := 16687, "RainmeterWindowMessage")
+OnMessage(16687, "RainmeterWindowMessage") ; 16687 = MESSAGE_RAINMETER
 
 ; allow message from non-elevated Rainmeter window
-DllCall("ChangeWindowMessageFilterEx", Ptr, hWnd, Uint, MESSAGE_RAINMETER, Uint, MSGFLT_ALLOW := 1, ptr, 0)
+DllCall("ChangeWindowMessageFilterEx", Ptr, hWnd, Uint, 16687, Uint, 1, ptr, 0) ; 16687 = MESSAGE_RAINMETER, 1 = MSGFLT_ALLOW
 
 ; Set up foot pedal commands
 AHKHID_UseConstants()
-OnMessage(0x00FF, "InputMsg") ; Intercept WM_INPUT
-AHKHID_Register(12, 1, hWnd, 256) ; RIDEV_INPUTSINK
+OnMessage(0x00FF, "InputMsg") ; 0x00FF = WM_INPUT
+AHKHID_Register(12, 1, hWnd, 256) ; 256 = RIDEV_INPUTSINK ; other values determined empirically
+
+AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
+AntimicroExists := FileExist(AntimicroPath)
+
+Process, Exist, Launchy.exe
+LaunchyActive := (ErrorLevel != 0)
+
+LaunchOrHidePlover()
+
+HtArray := -1
 
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
@@ -51,7 +61,7 @@ ShellMessage(wParam, lParam) {
 ;    PlaceToolTip("Window event: " wParam " on " currentProcess)
   If (wParam = 2 OR wParam = 6) { ; HSHELL_WINDOWDESTROYED or HSHELL_REDRAW
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
-    ; PlaceToolTip("Window redrawn: " . currentProcess)
+    ; PlaceToolTip("Window redrawn: " currentProcess)
 
     If (currentProcess = "plover.exe") {
       ; Plover update
@@ -64,16 +74,13 @@ ShellMessage(wParam, lParam) {
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
-    ; PlaceToolTip("Window activated: " . currentProcess)
+    ; PlaceToolTip("Window activated: " currentProcess)
 
     ; Update Antimicro for Outlook transitions
     OutlookActive := (currentProcess = "outlook.exe")
     UpdateAntimicro(OutlookActive)
   }
 }
-
-AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
-AntimicroExists := FileExist(AntimicroPath)
 
 UpdateAntimicro(outlookActive) {
   global AntimicroPath, AntimicroExists
@@ -87,24 +94,6 @@ UpdateAntimicro(outlookActive) {
   }
 }
 
-SendRainmeterCommand(command) {
-  Send_WM_COPYDATA(command, "DummyRainWClass")
-}
-
-Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetWindowClass)  ; ByRef saves a little memory in this case.
-; This function sends the specified string to the specified window and returns the reply.
-; Cribbed from https://www.autohotkey.com/docs/commands/OnMessage.htm
-{
-    VarSetCapacity(CopyDataStruct, 3*A_PtrSize, 0)  ; Set up the structure's memory area.
-    ; First set the structure's cbData member to the size of the string, including its zero terminator:
-    SizeInBytes := (StrLen(StringToSend) + 1) * (A_IsUnicode ? 2 : 1)
-    NumPut(1, CopyDataStruct) ; Per example at https://docs.rainmeter.net/developers/
-    NumPut(SizeInBytes, CopyDataStruct, A_PtrSize)  ; OS requires that this be done.
-    NumPut(&StringToSend, CopyDataStruct, 2*A_PtrSize)  ; Set lpData to point to the string itself.
-    SendMessage, 0x4a, 0, &CopyDataStruct,, ahk_class %TargetWindowClass%  ; 0x4a is WM_COPYDATA. Must use Send not Post.
-    return ErrorLevel  ; Return SendMessage's reply back to our caller.
-}
-
 RainmeterWindowMessage(wParam, lParam) { 
   global TimerActiveStart
   If (wParam = 0) { ; timer start
@@ -115,13 +104,6 @@ RainmeterWindowMessage(wParam, lParam) {
     CheckMusicBeePlayCount()
   }
 }
-
-Process, Exist, Launchy.exe
-LaunchyActive := (ErrorLevel != 0)
-
-LaunchOrHidePlover()
-
-HtArray := -1
 
 ^/::
 ^?::
@@ -220,16 +202,14 @@ return
 
 :oc:htrt:: ; Test home teaching stuff
 Loop {
-  PlaceTooltip(HtArray.MaxIndex())
+  ; PlaceTooltip(HtArray.MaxIndex())
   OneHomeTeaching(true)
 } Until (!HtArray.MaxIndex())
 return
 
 #IfWinActive ahk_class Chrome_WidgetWin_1
 :oc:chtr::
-:oc:htr::
-OneHomeTeaching()
-return
+:oc:htr::OneHomeTeaching()
 
 OneHomeTeaching(test = false) {
 Global HtArray
@@ -294,94 +274,70 @@ if (!test) {
 
 ; App-specific hotkeys
 
+; ResophNotes
 #IfWinActive ResophNotes
 ^e::^f
 
-#IfWinActive WriteMonkey ; WriteMonkey
+; WriteMonkey
+#IfWinActive WriteMonkey
 #c::Send !{F12} ; reset partial count
 ^p::Send ^ep ; bring up pomodoro window
-#IfWinActive
 
-#IfWinActive ahk_class TscShellContainerClass ; RDP/MSTSC window
-
-^!f::
-PlaceTooltip("RDP: Toggling fullscreen.")
-Send ^!{CtrlBreak}
+; RDP Window
+#IfWinActive ahk_class TscShellContainerClass
+^!f::Send ^!{CtrlBreak} ; toggle full-screen
 return
 
-LAlt & Tab::
-WinGet, Style, Style, A ; active window
-if (Style & 0x40000) { ; WS_SIZEBOX
-  Send {Blind}{Tab}
-} else {
-  Send {Blind}{PgUp} ; {blind} keeps the alt key down
-}
-return
+; Full-screen RDP window
+#If WinActive("ahk_class TscShellContainerClass") and IsFullScreen()
+LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
+#w::Send !{F4}
+LWin::Send !{Home}
 
-#w::
-WinGet, Style, Style, A ; active window
-if (Style & 0x40000) { ; WS_SIZEBOX
-  PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
-} else {
-  Send !{F4}
-}
-return
-
+; Chrome
 #IfWinActive ahk_class Chrome_WidgetWin_1
-
 ^O::return
 
+; Skype for Business
 #IfWinActive ahk_class LyncConversationWindowClass
+^Enter::Send {Enter} ; Instead of starting video chat
 
-^Enter::
-Send {Enter} ; Instead of starting video chat
-return
-
-/**
- * Ctrl+Backspace in Notepad
- */
+; Notepad
 #IfWinActive ahk_class Notepad
 ^Backspace::Send +^{Left}{Backspace}
-#IfWinActive
 
-/**
- * Outlook keys
- */
+; Outlook
 #IfWinActive ahk_class rctrl_renwnd32
-
-/**
- * One-key Archive action in Outlook
- */
-$F6::Send ^+1
+$F6::Send ^+1 ; One-key archive
 $F7::Send ^+2
+
+; FamilySearch
+#IfWinActive FamilySearch Indexing
+Space::Tab
+Tab::Space
+#IfWinActive
 
 ; Windows Explorer
 #IfWinActive ahk_class CabinetWClass
 
-; Toggle hidden files and file extensions
+^!h:: ; Toggle hidden files
+RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
+HiddenFiles_Status := HiddenFiles_Status = 1 ? 2 : 1 ; toggle
+RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, %HiddenFiles_Status%
+Send, {F5}
+State_Word := HiddenFiles_Status = 1 ? "shown" : "hidden"
+PlaceTooltip("Hidden files " State_Word " (Ctrl+Alt+H)", "Window")
+Return
 
-; Ctrl+Alt+H - Toggle hidden files
-^!h::
-    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
-    If HiddenFiles_Status = 2
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 1
-    Else
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 2
-    Send, {F5}
-    PlaceTooltip("Hidden files toggled (Ctrl+Alt+H)", "Window")
-    Return
+^!e:: ; Toggle extensions
+RegRead, Ext_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt
+Ext_Status := Ext_Status = 1 ? 0 : 1 ; toggle
+RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, %Ext_Status%
+Send, {F5}
+State_Word := Ext_Status = 0 ? "shown" : "hidden"
+PlaceTooltip("File extensions " State_Word " (Ctrl+Alt+E)", "Window")
+Return
 
-; Ctrl+Alt+E - Toggle extensions
-^!e::
-    RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt
-    If HiddenFiles_Status = 1
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 0
-    Else
-        RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, HideFileExt, 1
-    Send, {F5}
-    PlaceTooltip("Extensions toggled (Ctrl+Alt+E)", "Window")
-    Return
-	
 ; Save and reload ahk if currently editing
 #ifwinactive Mine.ahk
 ^s::
@@ -399,11 +355,10 @@ return
 ^s::
 WinGetTitle, Title, A
 RegExMatch(Title, "(\w+)\.ini", SubPat)
-If (SubPat <> "") {
-PlaceTooltip("Reloading rainmeter skin " . SubPat1 . "...")
+If (SubPat = "") return
+PlaceTooltip("Reloading rainmeter skin " SubPat1 "...")
 send ^s ; save the script
-SendRainmeterCommand("[!Refresh " . SubPat1 . "]")
-}
+SendRainmeterCommand("[!Refresh " SubPat1 "]")
 return
 
 ; Product Studio
@@ -411,30 +366,91 @@ return
 ^Backspace::Send +^{Left}{Backspace}
 ^Enter::Send {F5}
 ^w::Send ^{F4}
-#IfWinActive
 
 ; ctrl+v paste in cmd prompt
 #IfWinActive ahk_class ConsoleWindowClass
-^V:: SendInput {Raw}%clipboard%
-return
+^V::SendInput {Raw}%clipboard%
 
+; MediaPlayerClassic (takes over media next/prev for voice notes)
+#IfWinExist ahk_class MediaPlayerClassicW
 
+Media_Next::
+Media_Play_Pause & 0::
+Media_Play_Pause & PgUp::
+$F11::ControlSend,,{PgDn},ahk_class MediaPlayerClassicW
+
+Media_Prev::
++Media_Next::
+Media_Play_Pause & 9::
+Media_Play_Pause & PgDn::
+$F10::ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
+
+; MusicBee
+#IfWinExist MusicBee
+Pause & ScrollLock::Send {Media_Next}
+Pause & PrintScreen::Send {Media_Prev}
+
+Media_Play_Pause::
+SetErgodoxConnected()
+F12::
+Pause::MB_PlayPause()
+
+Media_Next::
+F11::MB_NextTrack()
+
+Media_Prev::
++Media_Next::
+F10::
++F11::MB_PreviousTrack()
+
+^!Right:: ; fast forward 30 secs
+MB_SetPosition(MB_GetPosition() + 30000)
+Return
+
+^!Left:: ; rewind 10 secs
+time := (MB_GetPosition() - 10000)
+if (time < 0)
+  time := 0
+MB_SetPosition(time)
+Return
+
+^!Up:: ; increase volume
+MB_SetVolume(MB_GetVolume()+10)
+Return
+
+^!Down:: ; decrease volume
+MB_SetVolume(MB_GetVolume()-10)
+Return
+
+; StreamKeys
+#IfWinExist ahk_class Chrome_WidgetWin_1
+Media_Play_Pause::Send +!{Home}
+Media_Next::Send +^{PgDn}
++Media_Next::
+Media_Prev::Send +^{PgUp}
+
+; Show launchers
 #IfWinActive
+LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/Hotkeys.htm
+           ; without this, the windows key doesn't work for other shortcuts like it should!
 
-/**
- * Disable stupid key combinations I find annoying
- */
+#IfWinExist Launchy ahk_class QTool
+LWin::Send !{F10}
+
+#IfWinExist ahk_exe Executor.exe
+LWin::Send ^!+#w
+
+#IfWinExist Wox ahk_exe Wox.exe
+LWin::Send ^!+#w
+
+; Disable generally annoying hotkeys
+#IfWinActive
 #u::return ; disable narrator
 #Enter::return ; other narrator
 #F16::return ; can't believe this is a problem, but disable shutdown swipe
 
 $F1::
-SetTitleMatchMode 2
-IfWinActive, Inkscape
-  Send {F1}
-IfWinActive, Q10
-  Send {F1}
-IfWinActive, ahk_class VICE
+if (WinActive("Inkscape") or WinActive("Q10") or WinActive("ahk_class VICE"))
   Send {F1}
 else
   PlaceTooltip("F1 blocked. Try Shift+F1 if you really want it.")
@@ -442,47 +458,7 @@ return
 
 +F1::Send {F1}
 
-/**
- * Show Launchy
- */
-LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/Hotkeys.htm
-           ; without this, the windows key doesn't work for other shortcuts like it should!
-
-#IfWinExist Launchy ahk_class QTool
-LWin::
-;SetTitleMatchMode 2
-;WinGet, Style, Style, A ; active window
-;if ((WinActive("Virtual Machine Connection") or WinActive("Remote Desktop Connection")) and (!(Style & 0x40000)))
-;{
-;   Send !{Home}
-;} else {
-If (LaunchyActive) {
-  Send !{F10}
-  If (!WinExist("Launchy ahk_class QTool")) {
-    LaunchyActive := 0
-    Send {LWin}
-  }
-} Else { ; no Launchy
-  Send {LWin}
-}
-;}
-return
-
-#IfWinExist ahk_exe Executor.exe
-LWin::
-Send ^!+#w
-return
-
-#IfWinExist Wox ahk_exe Wox.exe
-LWin::
-Send ^!+#w
-return
-
-#IfWinActive
-
-/**
- * Left-handed lock on Dvorak
- */
+; Left-handed lock on Dvorak
 #o::
 LockWorkStation() {
 if (MB_GetPlayState() == MBPS_Playing) { ; If MusicBee is playing
@@ -504,93 +480,14 @@ if (SignOutStarted <> 1) {
   SignOutStarted := 1
   SetTimer,ResetSignOut,-1500
 } else {
-  SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
   PlaceTooltip("Signing out...")
+  SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
   Shutdown, 0
 }
 return
 
 ResetSignOut:
 SignOutStarted = 0
-return
-
-; Hook into next/prev if MPC is up and running
-#IfWinExist ahk_class MediaPlayerClassicW
-
-Media_Next::
-Media_Play_Pause & 0::
-Media_Play_Pause & PgUp::
-$F11:: ; next track
-ControlSend,,{PgDn},ahk_class MediaPlayerClassicW
-return
-
-Media_Prev::
-+Media_Next::
-Media_Play_Pause & 9::
-Media_Play_Pause & PgDn::
-$F10:: ; previous track
-ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
-return
-
-; Remappings for MusicBee
-#IfWinExist MusicBee
-
-Pause & ScrollLock::Send {Media_Next}
-Pause & PrintScreen::Send {Media_Prev}
-
-Media_Play_Pause::
-SetErgodoxConnected()
-F12::
-Pause::
-; PlaceTooltip("Play/pause")
-MB_PlayPause()
-return
-
-Media_Next::
-F11::
-MB_NextTrack()
-return
-
-Media_Prev::
-+Media_Next::
-F10::
-+F11::
-MB_PreviousTrack()
-return
-
-^!Right:: ; fast forward 30 secs
-MB_SetPosition(MB_GetPosition() + 30000)
-Return
-
-^!Left:: ; rewind 10 secs
-time := (MB_GetPosition() - 10000)
-if (time < 0)
-  time := 0
-MB_SetPosition(time)
-Return
-
-^!Up:: ; increase volume
-MB_SetVolume(MB_GetVolume()+10)
-Return
-
-^!Down:: ; decrease volume
-MB_SetVolume(MB_GetVolume()-10)
-Return
-
-#IfWinExist ahk_class Chrome_WidgetWin_1
-; StreamKeys hotkeys
-
-Media_Play_Pause::
-Send +!{Home}
-return
-
-Media_Next::
-Send +^{PgDn}
-return
-
-+Media_Next::
-Media_Prev::
-Send +^{PgUp}
 return
 
 #IfWinActive
@@ -601,106 +498,79 @@ return
 #q::Send !{F4}
 #n::WinMinimize, A
 
+; Toggle always-on-top
 ^!a::
 Winset, Alwaysontop, , A
 WinGet, ExStyle, ExStyle, A
 winistop := (ExStyle & 0x8) ; 0x8 is WS_EX_TOPMOST.
-PlaceTooltip("Window " . (winistop ? "" : "no longer ") . "on top (Ctrl+Alt+A)", "Window")
+PlaceTooltip("Window " (winistop ? "" : "no longer ") "on top (Ctrl+Alt+A)", "Window")
 return
 
+; Toggle window border
 ^!b::
 id := WinExist("A")
-
-Winset, Style, ^0xC00000, A ; WS_CAPTION
+Winset, Style, ^0xC00000, A ; 0xC00000 = WS_CAPTION
 WinGet, Style, Style, A
-winisborder := (Style & 0xC00000) ; 0xC00000 is WS_CAPTION
-PlaceTooltip("Window " . (winisborder ? "no longer " : "") . "unbordered (Ctrl+Alt+B)", "Window")
-
+winisborder := (Style & 0xC00000) ; 0xC00000 = WS_CAPTION
+PlaceTooltip("Window " (winisborder ? "no longer " : "") "unbordered (Ctrl+Alt+B)", "Window")
 ; Toggle Sizebox only if it starts with Sizebox
-appwindowtoggle := (Style & 0x40000) || WinHasSizeBox_%id% ; WS_SizeBox
+appwindowtoggle := (Style & 0x40000) || WinHasSizeBox_%id% ; 0x40000 = WS_SizeBox
 if (appwindowtoggle) {
   WinHasSizeBox_%id% := appwindowtoggle
-  WinSet, Style, ^0x40000, A ; WS_SizeBox
-  PlaceTooltip("Window has/had sizebox; state saved/restored", "Window")
+  WinSet, Style, ^0x40000, A ; 0x40000 = WS_SizeBox
+  ; PlaceTooltip("Window has/had sizebox; state saved/restored", "Window")
 }
-
 return
 
-^!h:: ; Hide a window from the taskbar
-
+; Hide a window from the taskbar
+^!h::
 Send {LControl Up}{LAlt Up}
 ; Setting Toolwindow is easy; we just assume that no windows have that set by default
 WinHide, A
-WinSet, ExStyle, ^0x80, A ; WS_EX_TOOLWINDOW
+WinSet, ExStyle, ^0x80, A ; 0x80 = WS_EX_TOOLWINDOW
 WinGet, ExStyle, ExStyle, A
-winisvisible := (ExStyle & 0x80) ; WS_EX_TOOLWINDOW
-PlaceTooltip("Window " . (winisvisible ? "" : "no longer ") . "hidden from the taskbar and alt-tab list(Ctrl+Alt+H)", "Window")
-
+winisvisible := (ExStyle & 0x80) ; 0x80 = WS_EX_TOOLWINDOW
+PlaceTooltip("Window " (winisvisible ? "" : "no longer ") "hidden from the taskbar and alt-tab list(Ctrl+Alt+H)", "Window")
 ; Setting AppWindow appropriately is harder and requires state
 id := WinExist("A")
-appwindowtoggle := (ExStyle & 0x40000) || WinIsAppWindow_%id% ; WS_EX_APPWINDOW
+appwindowtoggle := (ExStyle & 0x40000) || WinIsAppWindow_%id% ; 0x40000 = WS_EX_APPWINDOW
 if (appwindowtoggle) {
   WinIsAppWindow_%id% := appwindowtoggle
-  WinSet, ExStyle, ^0x40000, A ; WS_EX_APPWINDOW
-  PlaceTooltip("Window was/is app window; state saved/restored", "Window")
+  WinSet, ExStyle, ^0x40000, A ; 0x40000 = WS_EX_APPWINDOW
+  ; PlaceTooltip("Window was/is app window; state saved/restored", "Window")
 }
-
 WinShow, A
 return
 
 ^!c::
 WinGet, ExStyle, ExStyle, A
 WinGet, Style, Style, A
-PlaceTooltip("Window style: " . ExStyle . ", " . Style)
+PlaceTooltip("Window style: " ExStyle ", " Style)
 return 
 
+; Raw paste
 ^!v::
 clipboard=%clipboard%
 sendraw %clipboard%
 return
 
-;------------------
-; Tooltip functions
-ToolTipOff:
-ToolTip
-return
-
-PlaceTooltip(byref text, location="Screen", delay=1000)
-{
-	if (location="Window") {
-		CoordMode, ToolTip, Window
-		WinGetPos, X, Y, W, H, A
-		X := W / 2
-		Y := 25
-	} else if (location="Cursor") { 
-		; don't set X and Y
-	} else { 
-		CoordMode, ToolTip, Screen
-		x := A_ScreenWidth - 180
-		Y := A_ScreenHeight - 80
-	}
-	ToolTip, % text, X, Y
-	if (delay > -1) {
-		SetTimer,ToolTipOff,-%delay%
-	}
-}
-
-#+R:: ; Restore all windows
+#+r:: ; Restore all windows
 WinGet, id, list,,, Program Manager
 Loop, %id%
 {
-    this_id := id%A_Index%
-    WinGetTitle, this_title, ahk_id %this_id%
-    if (InStr(this_title, "KeePass")) {
-        continue
-    }
-    WinGet, this_minimized, MinMax, ahk_id %this_id%
-    if (this_minimized == -1) {
-        WinRestore, ahk_id %this_id%
-    }
+  this_id := id%A_Index%
+  WinGetTitle, this_title, ahk_id %this_id%
+  if (InStr(this_title, "KeePass")) {
+    continue
+  }
+  WinGet, this_minimized, MinMax, ahk_id %this_id%
+  if (this_minimized == -1) {
+    WinRestore, ahk_id %this_id%
+  }
 }
 Return
 
+; Timer
 #^t:: ; Set 2-minute timer
 StartTimer(2*60,, "4,192,64,255")
 return
@@ -725,13 +595,13 @@ StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCoun
   TimerActiveStart := A_TickCount
   If (EventFromAHK) {
     If (mod(Seconds,60) = 0) {
-      PrettyTime := Seconds // 60 . " minutes"
+      PrettyTime := Seconds // 60 " minutes"
     } Else {
       T = 20000101000000
       T += Seconds, Seconds
       FormatTime PrettyTime, %T%, mm:ss
     }
-    PlaceTooltip("Timer set for " . PrettyTime . ".", , 3000)
+    PlaceTooltip("Timer set for " PrettyTime ".", , 3000)
     SoundPlay, alarmstart.wav
     SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
     delay := -1000*(Seconds)
@@ -752,7 +622,7 @@ CancelTimer(EventFromAHK = true) {
     T = 20000101000000
     T += Duration, Seconds
     FormatTime FormdT, %T%, mm:ss
-    PlaceTooltip("Timer canceled after " . FormdT, , 3000)
+    PlaceTooltip("Timer canceled after " FormdT, , 3000)
     SetTimer, TimerEnd, off
   }
   TimerActiveStart = 0
@@ -772,13 +642,11 @@ return
 
 CheckMusicBeePlayCount() {
   PlayCount := MB_GetFileProperty(MBFP_PlayCount)
-  ; PlaceToolTip("PlayCount: " . PlayCount)
-  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " . PlayCount . "][!UpdateMeasure mPlayCount NowPlaying]")
+  ; PlaceToolTip("PlayCount: " PlayCount)
+  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " PlayCount "][!UpdateMeasure mPlayCount NowPlaying]")
 }
 
-; Ergodox functionality
-
-; F13::Run, "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+; Ergodox special keys
 F14::Send μ
 +F14::Send Μ
 F15::Send λ
@@ -789,16 +657,16 @@ F16::Send α
 +F16::Send Α
 ^F16::Send ∫
 F17::Send ∞
-^+8::Send ×
-+NumpadMult::Send ×
+^+8::
++NumpadMult::
 F18::Send ×
 
 F24:: ;plover launch
 LaunchPlover()
 return
 
-+F24:: ;plover re-launch
-+F23:: ;plover re-launch
++F24:: ;plover re-start
++F23::
 If (WinExist("Plover ahk_class wxWindowNR")) {
   WinClose,,,5
 }
@@ -810,20 +678,6 @@ PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,1000
 return
 
-IsMusicPlaying() {
-audioMeter := VA_GetAudioMeter()
-
-VA_IAudioMeterInformation_GetMeteringChannelCount(audioMeter, channelCount)
-
-; "The peak value for each channel is recorded over one device
-;  period and made available during the subsequent device period."
-VA_GetDevicePeriod("capture", devicePeriod)
-
-    ; Get the peak value across all channels.
-    VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)    
-    return (peakValue > 0.01)
-}
-
 ; Get rid of Win+Tab, replace it with the more helpful and conventional Alt+Tab
 LWin & Tab::AltTab
 
@@ -833,16 +687,11 @@ LWin & Tab::AltTab
 ; LCtrl & LWin::Send {Alt Down}
 ; LCtrl & LWin Up::Send {Alt Up}
 
-ErgodoxConnected()
-{
-  return ErgodoxState
-}
-
 SetErgodoxConnected()
 {
   global ErgodoxState
   If (ErgodoxState <> true) {
-    PlaceTooltip("Noticed Ergodox. Setting keys right." . ErgodoxState)
+    ; PlaceTooltip("Noticed Ergodox. Setting keys right." ErgodoxState)
     ErgodoxState := true
     Hotkey, IfWinExist, MusicBee
     Hotkey, F12, Off
@@ -861,7 +710,7 @@ If (!WinExist("Plover ahk_class wxWindowNR")) {
 
 LaunchPlover() {
 If (!WinExist("Plover ahk_class wxWindowNR")) {
-  PlaceToolTip("No Plover found; launching...", , 3000)
+  ; PlaceToolTip("No Plover found; launching...", , 3000)
   Run, ..\Plover\plover.exe
   WinWait, Plover ahk_class wxWindowNR, , 25
   SetTimer, HidePlover, -2000
@@ -878,7 +727,7 @@ UpdatePloverWindowStatus() {
   static PloverLastStatus = 0
   WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
   PloverCurrentStatus := InStr(PloverTitle, ": running") ? -1 : InStr(PloverTitle, ": stopped") ? 1 : 0
-  If (PloverCurrentStatus != PloverLastStatus) { ; state change
+  If (PloverCurrentStatus != PloverLastStatus) { ; state change 
     If ((PloverCurrentStatus = -1) != (A_IsSuspended))
       Suspend ; suspend hotkeys when Plover running
     SendRainmeterCommand("[!SetVariable IndicatorState " PloverCurrentStatus "][!Update PloverStatus]")
@@ -909,7 +758,7 @@ MouseClickTurboToggle(autoclick = false) {
   If (MouseClickTurbo && autoclick) {
     SetTimer, MouseClickTurboClick, 20
   }
-  PlaceToolTip("Mouse click turbo mode " . (MouseClickTurbo ? "on" : "off"), "Cursor")
+  PlaceToolTip("Mouse click turbo mode " (MouseClickTurbo ? "on" : "off"), "Cursor")
 }
 
 #If MouseClickTurbo = true
@@ -917,7 +766,6 @@ MouseClickTurboToggle(autoclick = false) {
 LButton::
 Click
 SetTimer, MouseClickTurboClick, 20
-MouseClickTurboActive := True
 return
 
 LButton Up::
@@ -928,67 +776,112 @@ MouseClickTurboClick:
 Click
 return
 
-#IfWinActive FamilySearch Indexing
-Space::Tab
-Tab::Space
-#IfWinActive
+; Helper functions
 
 InputMsg(wParam, lParam) { ; Handle foot pedal events
-    Local r, h
-    Static footPedalLastState := 0
-    Static FootPedalButtons := [4, 2, 1]
-    Critical    ;Or otherwise you could get ERROR_INVALID_HANDLE
-    
-    ;Get device type
-    r := AHKHID_GetInputInfo(lParam, II_DEVTYPE) 
-    If (r = -1)
-        OutputDebug %ErrorLevel%
-    Else If (r = RIM_TYPEHID){
-        h := AHKHID_GetInputInfo(lParam, II_DEVHANDLE)
-        if (   AHKHID_GetDevInfo(h, DI_HID_VENDORID, True) = 1972
-            && AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,True) = 536) { ; is my foot pedal
-            r := AHKHID_GetInputData(lParam, uData)
-            if (r = 9) { ; it should always be 9 bytes back, just checking
-              footPedalState := (*(&uData+3))
-              for k, v in FootPedalButtons {
-                if (footPedalState & ~footPedalLastState & v) {
-                  ; PlaceToolTip("Button " . k . " pressed.")
-                  FootPedalButtonPressed(k)
-                }
-              }
-              footPedalLastState := footPedalState
-            }
+  Local r, h
+  Static footPedalLastState := 0
+  Static FootPedalButtons := [4, 2, 1]
+  Critical    ;Or otherwise you could get ERROR_INVALID_HANDLE
+  
+  ;Get device type
+  r := AHKHID_GetInputInfo(lParam, II_DEVTYPE) 
+  If (r = -1)
+    OutputDebug %ErrorLevel%
+  Else If (r = RIM_TYPEHID){
+    h := AHKHID_GetInputInfo(lParam, II_DEVHANDLE)
+    if (   AHKHID_GetDevInfo(h, DI_HID_VENDORID, True) = 1972
+      && AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,True) = 536) { ; is my foot pedal
+      r := AHKHID_GetInputData(lParam, uData)
+      if (r = 9) { ; it should always be 9 bytes back, just checking
+        footPedalState := (*(&uData+3))
+        for k, v in FootPedalButtons {
+          if (footPedalState & ~footPedalLastState & v) {
+            ; PlaceToolTip("Button " k " pressed.")
+            FootPedalButtonPressed(k)
+          }
         }
+        footPedalLastState := footPedalState
+      }
     }
+  }
 }
 
 FootPedalButtonPressed(k = 0) {
   If (k = 1) { ; left button
     SoundBeep, 600, 50
-  } Else if (k = 2) { ; center buttonIronCapMount10
+  } Else if (k = 2) { ; center button
     SoundBeep, 400, 50
   } Else if (k = 3) { ; right button
     SoundBeep, 800, 50
   }
 }
 
-SetIconState(name, state) {
+SetIconState(name = "timer", state = false) {
   global IconStateArray
   IconStateArray[name] := state
-  UpdateIcon()
-}
-
-UpdateIcon() {
-  global IconStateArray
-  iconFound := false
   for key, value in IconStateArray {
     if (value) {
       Menu, Tray, Icon, %key%.ico, , 1 ; freeze
-      iconFound := true
-      break
+      return
     }
   }
-  if (!iconFound) {
-    Menu, Tray, Icon, icon.ico
-  }
+  Menu, Tray, Icon, icon.ico
+}
+
+IsFullScreen() {
+  WinGet, Style, Style, A ; active window
+  return !(Style & 0x40000) ; 0x40000 = WS_SIZEBOX
+}
+
+; Tooltip
+PlaceTooltip(byref text, location="Screen", delay=1000)
+{
+	if (location="Window") {
+		CoordMode, ToolTip, Window
+		WinGetPos, X, Y, W, H, A
+		X := W / 2
+		Y := 25
+	} else if (location="Cursor") { 
+		; don't set X and Y
+	} else { 
+		CoordMode, ToolTip, Screen
+		x := A_ScreenWidth - 180
+		Y := A_ScreenHeight - 80
+	}
+	ToolTip, % text, X, Y
+	if (delay > -1) {
+		SetTimer,ToolTipOff,-%delay%
+	}
+}
+
+ToolTipOff:
+ToolTip
+return
+
+; Check if sound is being output
+IsMusicPlaying() {
+audioMeter := VA_GetAudioMeter()
+VA_IAudioMeterInformation_GetMeteringChannelCount(audioMeter, channelCount)
+VA_GetDevicePeriod("capture", devicePeriod)
+VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)    
+return (peakValue > 0.01)
+}
+
+SendRainmeterCommand(ByRef command) {
+  Send_WM_COPYDATA(command, "DummyRainWClass")
+}
+
+Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetWindowClass)  ; ByRef saves a little memory in this case.
+; This function sends the specified string to the specified window and returns the reply.
+; Cribbed from https://www.autohotkey.com/docs/commands/OnMessage.htm
+{
+    VarSetCapacity(CopyDataStruct, 3*A_PtrSize, 0)  ; Set up the structure's memory area.
+    ; First set the structure's cbData member to the size of the string, including its zero terminator:
+    SizeInBytes := (StrLen(StringToSend) + 1) * (A_IsUnicode ? 2 : 1)
+    NumPut(1, CopyDataStruct) ; Per example at https://docs.rainmeter.net/developers/
+    NumPut(SizeInBytes, CopyDataStruct, A_PtrSize)  ; OS requires that this be done.
+    NumPut(&StringToSend, CopyDataStruct, 2*A_PtrSize)  ; Set lpData to point to the string itself.
+    SendMessage, 0x4a, 0, &CopyDataStruct,, ahk_class %TargetWindowClass%  ; 0x4a is WM_COPYDATA. Must use Send not Post.
+    return ErrorLevel  ; Return SendMessage's reply back to our caller.
 }
