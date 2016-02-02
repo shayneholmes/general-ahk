@@ -25,8 +25,9 @@ UpdateIcon()
 #Include MusicBeeIPC.ahk
 
 #Persistent
-SetBatchLines, 10ms
+SetBatchLines, -1
 Process, Priority,, High
+ListLines Off
 
 ; Shell Hook
 Gui +LastFound
@@ -712,7 +713,7 @@ return
 StartTimer(15*60,, "255,0,0,255", 1)
 return
 
-StartTimer(Seconds, EventFromAHK = true, Color = "4,192,64,255", TimerCount = 0)
+StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCount = 0)
 {
   global TimerActiveStart
   
