@@ -134,17 +134,24 @@ yd: Yesterday's Date (Thursday, 28 March 2013)
 ts: TimeStamp (2013-03-29)
 tt: Today+Time (2013-05-28T11-53)
 
-LWin: Show Launchy (Alt+F10)
+htr: Home teaching message (Chrome only)
+
+LWin: Show Wox (Ctrl+Shift+Alt+W)
 Win+T: Set/cancel timer (15 by default, ctrl=2, shift=5)
 
+Win+O: Lock workstation
+Win+Shift+O (2x): Sign out
+Ctrl+Alt+V: Paste clipboard text
+
+Window commands:
 Ctrl+Alt+A: Window on top
 Ctrl+Alt+B: Hide window border
 Ctrl+Alt+H: Hide window from taskbar
 Win+Shift+R: Restore all windows
 Win+H: Hide current window
 Win+U: Unhide window
-
-Win+O: Lock workstation
+Win+W: Close current window
+Win+N: Minimize current window
 
 Media Keys:
 F12: Play/Pause
@@ -156,6 +163,12 @@ Ctrl+Shift+Up/Down: Volume
 Explorer:
 Ctrl+Alt+H: Toggle hidden files
 Ctrl+Alt+E: Toggle extensions
+
+RDP (full-screen):
+Ctrl+Alt+F: Toggle full-screen			
+
+WriteMonkey:
+Win+C: Reset word count
 )
 PlaceTooltip(HelpText, ,5000)
 return
