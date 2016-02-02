@@ -34,10 +34,10 @@ hWnd := WinExist("Mine ahk_class AutoHotkey")
 DllCall("RegisterShellHookWindow", UInt,hWnd)
 MsgNum := DllCall("RegisterWindowMessage", Str,"SHELLHOOK")
 OnMessage(MsgNum, "ShellMessage")
-OnMessage(16687, "RainmeterWindowMessage")
+OnMessage(MESSAGE_RAINMETER := 16687, "RainmeterWindowMessage")
 
 ; allow message from non-elevated Rainmeter window
-DllCall("ChangeWindowMessageFilterEx", Ptr, hWnd, Uint, 16687, Uint, MSGFLT_ALLOW := 1, ptr, 0)
+DllCall("ChangeWindowMessageFilterEx", Ptr, hWnd, Uint, MESSAGE_RAINMETER, Uint, MSGFLT_ALLOW := 1, ptr, 0)
 
 ; Set up foot pedal commands
 AHKHID_UseConstants()
@@ -893,18 +893,15 @@ If (WinExist("Plover ahk_class wxWindowNR")) {
 return
 
 UpdatePloverWindowStatus() {
-; Update Rainmeter
-WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
-PloverCurrentStatus := InStr(PloverTitle, ": running") ? -1 : InStr(PloverTitle, ": stopped") ? 1 : 0
-If (PloverCurrentStatus != PloverLastStatus) { ; state change
-  If (PloverCurrentStatus = -1) {
-    Suspend, On
-  } else {
-    Suspend, Off
-  }
-  SendRainmeterCommand("[!SetVariable IndicatorState " . PloverCurrentStatus . "][!Update PloverStatus]")
-  SetIconState("plover", (PloverCurrentStatus = -1))
-  PloverLastStatus := PloverCurrentStatus
+  static PloverLastStatus = 0
+  WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
+  PloverCurrentStatus := InStr(PloverTitle, ": running") ? -1 : InStr(PloverTitle, ": stopped") ? 1 : 0
+  If (PloverCurrentStatus != PloverLastStatus) { ; state change
+    If ((PloverCurrentStatus = -1) != (A_IsSuspended))
+      Suspend ; suspend hotkeys when Plover running
+    SendRainmeterCommand("[!SetVariable IndicatorState " PloverCurrentStatus "][!Update PloverStatus]")
+    SetIconState("plover", (PloverCurrentStatus = -1))
+    PloverLastStatus := PloverCurrentStatus
   }
 }
 
