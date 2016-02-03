@@ -602,7 +602,7 @@ StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCoun
       T += Seconds, Seconds
       FormatTime PrettyTime, %T%, mm:ss
     }
-    PlaceTooltip("Timer set for " PrettyTime ".", , 3000)
+    PlaceTooltip("Timer set for " PrettyTime ".")
     SoundPlay, alarmstart.wav
     SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
     delay := -1000*(Seconds)
@@ -623,7 +623,7 @@ CancelTimer(EventFromAHK = true) {
     T = 20000101000000
     T += Duration, Seconds
     FormatTime FormdT, %T%, mm:ss
-    PlaceTooltip("Timer canceled after " FormdT, , 3000)
+    PlaceTooltip("Timer canceled after " FormdT)
     SetTimer, TimerEnd, off
   }
   TimerActiveStart = 0
