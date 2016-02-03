@@ -738,7 +738,7 @@ UpdatePloverWindowStatus() {
 }
 
 #c::
-SendRainmeterCommand("[!CommandMeasure ""MeasureTimerScript"" ""ChangeVar()""]")
+PlaceTooltip("Here is a tooltip that's here for good.", , -1)
 return
 
 BeepPcSpeakers() {
@@ -836,8 +836,14 @@ IsFullScreen() {
 }
 
 ; Tooltip
-PlaceTooltip(byref text, location="Screen", delay=1000)
+PlaceTooltip(byref text, location="Rainmeter", delay=1000)
 {
+  delay := delay = -1 ? "off" : -delay
+  if (location="Rainmeter") {
+    SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!Update Tooltip][!Show Tooltip]")
+    SetTimer,ToolTipOffRainmeter,%delay%
+    return
+  }
 	if (location="Window") {
 		CoordMode, ToolTip, Window
 		WinGetPos, X, Y, W, H, A
@@ -845,16 +851,18 @@ PlaceTooltip(byref text, location="Screen", delay=1000)
 		Y := 25
 	} else if (location="Cursor") { 
 		; don't set X and Y
-	} else { 
+	} else if (location="Screen") { 
 		CoordMode, ToolTip, Screen
 		x := A_ScreenWidth - 180
 		Y := A_ScreenHeight - 80
 	}
 	ToolTip, % text, X, Y
-	if (delay > -1) {
-		SetTimer,ToolTipOff,-%delay%
-	}
+	SetTimer,ToolTipOff,%delay%
 }
+
+ToolTipOffRainmeter:
+SendRainmeterCommand("[!HideFade Tooltip]")
+return
 
 ToolTipOff:
 ToolTip
