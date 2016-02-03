@@ -840,7 +840,7 @@ PlaceTooltip(byref text, location="Rainmeter", delay=1000)
 {
   delay := delay = -1 ? "off" : -delay
   if (location="Rainmeter") {
-    SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!Update Tooltip][!Show Tooltip]")
+    SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!CommandMeasure ActionTimerShowFade ""Execute 2"" Tooltip]")
     SetTimer,ToolTipOffRainmeter,%delay%
     return
   }
@@ -861,7 +861,7 @@ PlaceTooltip(byref text, location="Rainmeter", delay=1000)
 }
 
 ToolTipOffRainmeter:
-SendRainmeterCommand("[!HideFade Tooltip]")
+SendRainmeterCommand("[!CommandMeasure ActionTimerShowFade ""Execute 1"" Tooltip]")
 return
 
 ToolTipOff:
