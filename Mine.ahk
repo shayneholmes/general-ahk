@@ -355,7 +355,8 @@ return
 ^s::
 WinGetTitle, Title, A
 RegExMatch(Title, "(\w+)\.ini", SubPat)
-If (SubPat = "") return
+If (SubPat = "")
+  return
 PlaceTooltip("Reloading rainmeter skin " SubPat1 "...")
 send ^s ; save the script
 SendRainmeterCommand("[!Refresh " SubPat1 "]")
