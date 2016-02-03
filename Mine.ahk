@@ -836,28 +836,30 @@ IsFullScreen() {
 }
 
 ; Tooltip
-PlaceTooltip(byref text, location="Rainmeter", delay=1000)
+PlaceTooltip(byref text, location="Screen", delay=1000)
 {
   delay := delay = -1 ? "off" : -delay
-  if (location="Rainmeter") {
-    SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!CommandMeasure ActionTimerShowFade ""Execute 2"" Tooltip]")
-    SetTimer,ToolTipOffRainmeter,%delay%
-    return
-  }
 	if (location="Window") {
-		CoordMode, ToolTip, Window
 		WinGetPos, X, Y, W, H, A
-		X := W / 2
-		Y := 25
+		X += W / 2
+		Y += H / 2
 	} else if (location="Cursor") { 
-		; don't set X and Y
+		CoordMode, Mouse, Screen
+		MouseGetPos, X, Y
 	} else if (location="Screen") { 
-		CoordMode, ToolTip, Screen
 		x := A_ScreenWidth - 180
 		Y := A_ScreenHeight - 80
 	}
-	ToolTip, % text, X, Y
-	SetTimer,ToolTipOff,%delay%
+  if (true) { ; using Rainmeter
+    SendRainmeterCommand("[!SetVariable Alignment """ location """ Tooltip][!SetVariable AlignmentX """ X """ Tooltip][!SetVariable AlignmentY """ Y """ Tooltip]")
+    SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!CommandMeasure ActionTimerShowFade ""Execute 2"" Tooltip]")
+    SetTimer,ToolTipOffRainmeter,%delay%
+    return
+  } else {
+    CoordMode, ToolTip, Screen
+    ToolTip, % text, X, Y
+    SetTimer,ToolTipOff,%delay%
+  }
 }
 
 ToolTipOffRainmeter:
