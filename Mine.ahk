@@ -98,7 +98,7 @@ UpdateAntimicro(outlookActive) {
 }
 
 RainmeterWindowMessage(wParam, lParam) { 
-  global TimerActiveStart, RainmeterTooltipActive
+  global RainmeterTooltipActive
   If (wParam = 0) { ; timer start
     StartTimer(lParam, false)
   } Else If (wParam = 1) { ; timer end
