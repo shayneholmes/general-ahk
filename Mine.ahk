@@ -441,13 +441,13 @@ Media_Prev::Send +^{PgUp}
 LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/Hotkeys.htm
            ; without this, the windows key doesn't work for other shortcuts like it should!
 
-#IfWinExist Launchy ahk_class QTool
+#IfWinExist ahk_exe Launchy.exe
 LWin::Send !{F10}
 
 #IfWinExist ahk_exe Executor.exe
 LWin::Send ^!+#w
 
-#IfWinExist Wox ahk_exe Wox.exe
+#IfWinExist ahk_exe Wox.exe
 LWin::Send ^!+#w
 
 ; Disable generally annoying hotkeys
