@@ -55,6 +55,9 @@ LaunchOrHidePlover()
 
 HtArray := -1
 
+CheckRainmeterTooltipHeartbeat()
+SetTimer, CheckRainmeterTooltipHeartbeat, 300000 ; 5 minutes
+
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
 ;    WinGet, currentProcess, ProcessName, ahk_id %lParam%
@@ -95,13 +98,16 @@ UpdateAntimicro(outlookActive) {
 }
 
 RainmeterWindowMessage(wParam, lParam) { 
-  global TimerActiveStart
+  global TimerActiveStart, RainmeterTooltipActive
   If (wParam = 0) { ; timer start
     StartTimer(lParam, false)
   } Else If (wParam = 1) { ; timer end
     CancelTimer(false)
   } Else If (wParam = 2) { ; track change
     CheckMusicBeePlayCount()
+  } Else If (wParam = 3) { ; tooltip heartbeat
+    RainmeterTooltipActive := true
+    SetTimer, DisableRainmeterTooltip, off
   }
 }
 
@@ -838,6 +844,7 @@ IsFullScreen() {
 ; Tooltip
 PlaceTooltip(byref text, location="Screen", delay=1000)
 {
+  global RainmeterTooltipActive
   delay := delay = -1 ? "off" : -delay
 	if (location="Window") {
 		WinGetPos, X, Y, W, H, A
@@ -850,7 +857,7 @@ PlaceTooltip(byref text, location="Screen", delay=1000)
 		x := A_ScreenWidth - 180
 		Y := A_ScreenHeight - 80
 	}
-  if (true) { ; using Rainmeter
+  if (RainmeterTooltipActive) {
     SendRainmeterCommand("[!SetVariable Alignment """ location """ Tooltip][!SetVariable AlignmentX """ X """ Tooltip][!SetVariable AlignmentY """ Y """ Tooltip]")
     SendRainmeterCommand("[!SetVariable Message """ text """ Tooltip][!CommandMeasure ActionTimerShowFade ""Execute 2"" Tooltip]")
     SetTimer,ToolTipOffRainmeter,%delay%
@@ -861,6 +868,15 @@ PlaceTooltip(byref text, location="Screen", delay=1000)
     SetTimer,ToolTipOff,%delay%
   }
 }
+
+CheckRainmeterTooltipHeartbeat() {
+  SendRainmeterCommand("[!CommandMeasure MeasureAhkWindowMessaging ""SendMessage 16687 3 0"" Tooltip]")
+  SetTimer, DisableRainmeterTooltip, -1000 ; must be less than the heartbeat cadence
+}
+
+DisableRainmeterTooltip:
+RainmeterTooltipActive := false
+return
 
 ToolTipOffRainmeter:
 SendRainmeterCommand("[!CommandMeasure ActionTimerShowFade ""Execute 1"" Tooltip]")
