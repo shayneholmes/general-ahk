@@ -287,7 +287,12 @@ if (!test) {
 ; WriteMonkey
 #IfWinActive WriteMonkey
 #c::Send !{F12} ; reset partial count
-^p::Send ^ep ; bring up pomodoro window
+^p:: ; bring up pomodoro window
+Send ^ep
+Sleep, 100
+If WinActive("plugin_blank")
+  Send {Esc}
+return
 
 ; RDP Window
 #IfWinActive ahk_class TscShellContainerClass
