@@ -663,15 +663,14 @@ F14::Send μ
 +F14::Send Μ
 F15::Send λ
 +F15::Send Λ
-^F15::Send Δ
-^+F15::Send 𝛿
+F18::Send ♯
++F18::Send ♭
 F16::Send α
 +F16::Send Α
 ^F16::Send ∫
 F17::Send ∞
 ^+8::
-+NumpadMult::
-F18::Send ×
++NumpadMult::Send ×
 
 F24:: ;plover launch
 LaunchPlover()
