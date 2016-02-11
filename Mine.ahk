@@ -20,6 +20,7 @@ IconStateArray := {timer: false, plover: false} ; set precedence for icons
 SetIconState()
 
 #Include lib
+#include Gdip.ahk
 #Include minimizetray.ahk
 #Include MusicBeeIPC ; the path to the MusicBeeIPC SDK
 #Include MusicBeeIPC.ahk
@@ -45,6 +46,8 @@ AHKHID_UseConstants()
 OnMessage(0x00FF, "InputMsg") ; 0x00FF = WM_INPUT
 AHKHID_Register(12, 1, hWnd, 256) ; 256 = RIDEV_INPUTSINK ; other values determined empirically
 
+EnvGet, UserProfile, UserProfile
+
 AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
 AntimicroExists := FileExist(AntimicroPath)
 
@@ -54,6 +57,11 @@ LaunchyActive := (ErrorLevel != 0)
 LaunchOrHidePlover()
 
 HtArray := -1
+
+; Set up highlighter for screenshots
+Gui, ScreenshotSelection:New, -Caption +ToolWindow +LastFound
+Gui, ScreenshotSelection:Color, Yellow
+WinSet, Transparent, 100
 
 CheckRainmeterTooltipHeartbeat()
 SetTimer, CheckRainmeterTooltipHeartbeat, 300000 ; 5 minutes
@@ -748,8 +756,80 @@ UpdatePloverWindowStatus() {
 }
 
 #c::
-PlaceTooltip("Here is a tooltip that's here for good.", , -1)
 return
+
+RCtrl & RButton::
+TakeScreenshot() {
+global UserProfile
+CoordMode, Mouse, Screen
+MouseGetPos, begin_x, begin_y
+DrawRectangle(true)
+SetTimer, rectangle, 10
+KeyWait, RButton
+
+SetTimer, rectangle, Off
+Gui, ScreenshotSelection:Cancel
+MouseGetPos, end_x, end_y
+
+Capture_x := (end_x < begin_x) ? end_x : begin_x
+Capture_y := (end_y < begin_y) ? end_y : begin_y
+Capture_width := Abs(end_x - begin_x)
+Capture_height := Abs(end_y - begin_y)
+
+area := Capture_x . "|" . Capture_y . "|" . Capture_width . "|" Capture_height ; X|Y|W|H 
+
+FormatTime, CurrentDateTime,, yyyy-MM-ddTHH-mm-ss
+
+filename := UserProfile "\downloads\screenshot " CurrentDateTime ".png"
+
+Screenshot(filename,area)
+return
+}
+
+rectangle:
+DrawRectangle()
+return
+
+DrawRectangle(startNewRectangle := false) {
+static lastX, lastY
+static xorigin, yorigin
+global x1, y1, x2, y2
+
+if (startNewRectangle) {
+  MouseGetPos, xorigin, yorigin
+}
+
+CoordMode, Mouse, Screen
+MouseGetPos, currentX, currentY
+
+; Has the mouse moved?
+if (lastX lastY) = (currentX currentY)
+return
+
+lastX := currentX
+lastY := currentY
+
+; Allow dragging to the left of the click point.
+if (currentX < xorigin) {
+x1 := currentX
+x2 := xorigin
+} else {
+x1 := xorigin
+x2 := currentX
+}
+
+; Allow dragging above the click point.
+if (currentY < yorigin) {
+y1 := currentY
+y2 := yorigin
+} else {
+y1 := yorigin
+y2 := currentY
+}
+
+Gui, ScreenshotSelection:Show, % "NA X" x1 " Y" y1 " W" x2-x1 " H" y2-y1
+Gui, ScreenshotSelection:+LastFound
+}
 
 BeepPcSpeakers() {
 ; SoundBeep 400, 40
@@ -786,6 +866,20 @@ return
 MouseClickTurboClick:
 Click
 return
+
+Screenshot(outfile, screen) {
+pToken := Gdip_Startup()
+raster := 0x40000000 + 0x00CC0020 ; get layered windows
+
+pBitmap := Gdip_BitmapFromScreen(screen,raster)
+
+Gdip_SetBitmapToClipboard(pBitmap)
+Gdip_SaveBitmapToFile(pBitmap, outfile)
+Gdip_DisposeImage(pBitmap)
+Gdip_Shutdown(pToken)
+
+PlaceTooltip("Screenshot copied and saved.")
+}
 
 ; Helper functions
 
