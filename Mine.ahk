@@ -465,7 +465,7 @@ LWin::Send ^!+#w
 
 ; Disable generally annoying hotkeys
 #IfWinActive
-#u::return ; disable narrator
+; #u::return ; disable narrator (turned off because I've included explicit #u below for unhide)
 #Enter::return ; other narrator
 #F16::return ; can't believe this is a problem, but disable shutdown swipe
 
@@ -492,6 +492,12 @@ DllCall("LockWorkStation")
 Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
+
+#u::
+goto mwt_UnMinimize
+
+#h::
+goto mwt_Minimize
 
 ; Sign out (hit it twice)
 #+o::
