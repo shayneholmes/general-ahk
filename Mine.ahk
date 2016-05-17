@@ -51,9 +51,6 @@ EnvGet, UserProfile, UserProfile
 AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
 AntimicroExists := FileExist(AntimicroPath)
 
-Process, Exist, Launchy.exe
-LaunchyActive := (ErrorLevel != 0)
-
 LaunchOrHidePlover()
 ; UpdatePloverWindowStatus() 
 
@@ -81,10 +78,6 @@ ShellMessage(wParam, lParam) {
     If (currentProcess = "plover.exe") {
       ; Plover update
       UpdatePloverWindowStatus()
-    }
-    Else if (currentProcess = "launchy.exe") {
-      Process, Exist, Launchy.exe
-      LaunchyActive := (ErrorLevel != 0)
     }
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
