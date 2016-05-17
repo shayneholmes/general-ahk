@@ -706,7 +706,7 @@ return
 
 #^r:: ; Reload
 PlaceTooltip("Reloading script...")
-SetTimer,ReloadScript,1000
+SetTimer,ReloadScript,-1000
 return
 
 ; Get rid of Win+Tab, replace it with the more helpful and conventional Alt+Tab
