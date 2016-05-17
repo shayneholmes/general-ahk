@@ -55,6 +55,10 @@ Process, Exist, Launchy.exe
 LaunchyActive := (ErrorLevel != 0)
 
 LaunchOrHidePlover()
+; UpdatePloverWindowStatus() 
+
+SetTimer, UpdatePloverWindowStatus, 5000
+
 
 HtArray := -1
 
@@ -686,9 +690,18 @@ F17::Send ∞
 ^+8::
 +NumpadMult::Send ×
 
-F24:: ;plover launch
-LaunchPlover()
+F24::ChangePloverStatus(true)
+
+F23::
+Suspend, Off
+ChangePloverStatus(false)
 return
+
+ChangePloverStatus(state) {
+  DesiredState := (state ? "Enable" : "Disable")
+  ControlClick, %DesiredState%, Plover ahk_class wxWindowNR
+  UpdatePloverWindowStatus()
+}
 
 +F24:: ;plover re-start
 +F23::
@@ -748,16 +761,21 @@ If (WinExist("Plover ahk_class wxWindowNR")) {
 }
 return
 
+UpdatePloverWindowStatus:
+UpdatePloverWindowStatus()
+return
+
 UpdatePloverWindowStatus() {
   static PloverLastStatus = 0
-  WinGetTitle, PloverTitle, ahk_class wxWindowNR ahk_exe plover.exe
-  PloverCurrentStatus := InStr(PloverTitle, ": running") ? -1 : InStr(PloverTitle, ": stopped") ? 1 : 0
+  ControlGet, PloverCurrentStatus, Checked, , Enable, Plover ahk_class wxWindowNR
+  PloverCurrentStatus := (PloverCurrentStatus = 1) ? -1 : ErrorLevel ? 0 : 1
   If (PloverCurrentStatus != PloverLastStatus) { ; state change 
     If ((PloverCurrentStatus = -1) != (A_IsSuspended))
       Suspend ; suspend hotkeys when Plover running
     SendRainmeterCommand("[!SetVariable IndicatorState " PloverCurrentStatus "][!Update PloverStatus]")
     SetIconState("plover", (PloverCurrentStatus = -1))
     PloverLastStatus := PloverCurrentStatus
+    ; PlaceTooltip("Plover status: " PloverCurrentStatus)
   }
 }
 
