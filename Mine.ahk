@@ -773,19 +773,7 @@ UpdatePloverWindowStatus() {
 }
 
 #c::
-OldDelay := A_KeyDelay
-SetKeyDelay, 150
-Send ^c
-Sleep, 200
-WinActivate, Free File Fillable Forms - Google Chrome
-Sleep, 200
-Send {Tab}
-Send ^v
-Sleep, 200
-WinActivate, Excel
-Sleep, 200
-Send {Tab}
-SetKeyDelay, %OldDelay%
+TrayTip, , Hi!
 return
 
 RCtrl & RButton::
