@@ -47,7 +47,6 @@ OnMessage(0x00FF, "InputMsg") ; 0x00FF = WM_INPUT
 AHKHID_Register(12, 1, hWnd, 256) ; 256 = RIDEV_INPUTSINK ; other values determined empirically
 
 EnvGet, UserProfile, UserProfile
-EnvGet, LocalAppData, LocalAppData
 
 AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
 AntimicroExists := FileExist(AntimicroPath)
@@ -58,7 +57,6 @@ LaunchyActive := (ErrorLevel != 0)
 LaunchOrHidePlover()
 ; UpdatePloverWindowStatus() 
 
-SetTimer, DisplayAnyNewPloverStrokes, 1000
 SetTimer, UpdatePloverWindowStatus, 5000
 
 
@@ -778,24 +776,6 @@ UpdatePloverWindowStatus() {
     SetIconState("plover", (PloverCurrentStatus = -1))
     PloverLastStatus := PloverCurrentStatus
     ; PlaceTooltip("Plover status: " PloverCurrentStatus)
-  }
-}
-
-DisplayAnyNewPloverStrokes:
-FileTail(LocalAppData "\plover\plover\strokes.log")
-WinGet, ActiveControlList, ControlList, Plover: Suggestions Display
-ControlGet, Line, LineCount, , Edit1, Plover: Stroke Display
-ControlGet, ActiveControlText, Line, %Line%, Edit1, Plover: Stroke Display
-;PlaceTooltip(ActiveControlText)
-return
-
-FileTail(File) {
-  static previousFile := ""
-  static lastTail := 0
-  if (File != previousFile) {
-;    PlaceTooltip(File " -> " previousFile)
-    previousFile := File
-    lastTail := 0
   }
 }
 
