@@ -632,7 +632,7 @@ StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCoun
   } else { ; Rainmeter started a new timer: cancel any existing AHK timer
     SetTimer, TimerEnd, off
   }
-  SetIconState("timer", true)
+  SetIconState("timer", "Timer set for " PrettyTime)
 }
 
 CancelTimer(EventFromAHK = true) {
@@ -766,7 +766,7 @@ UpdatePloverWindowStatus() {
     If ((PloverCurrentStatus = -1) != (A_IsSuspended))
       Suspend ; suspend hotkeys when Plover running
     SendRainmeterCommand("[!SetVariable IndicatorState " PloverCurrentStatus "][!Update PloverStatus]")
-    SetIconState("plover", (PloverCurrentStatus = -1))
+    SetIconState("plover", (PloverCurrentStatus = -1 ? "Plover input enabled" : false))
     PloverLastStatus := PloverCurrentStatus
     ; PlaceTooltip("Plover status: " PloverCurrentStatus)
   }
@@ -958,10 +958,13 @@ SetIconState(name = "timer", state = false) {
   for key, value in IconStateArray {
     if (value) {
       Menu, Tray, Icon, %key%.ico, , 1 ; freeze
+      Menu, Tray, Tip, %value%
       return
     }
   }
+  ; otherwise, reset tray icon and tooltip to default
   Menu, Tray, Icon, icon.ico
+  Menu, Tray, Tip, Autohotkey`, here making your life easier
 }
 
 IsFullScreen() {
