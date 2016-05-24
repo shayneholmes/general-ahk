@@ -80,6 +80,18 @@ ShellMessage(wParam, lParam) {
       UpdatePloverWindowStatus()
     }
   }
+  If (wParam = 1) { ; HSHELL_WINDOWCREATED
+    WinGet, currentProcess, ProcessName, ahk_id %lParam%
+    ; PlaceToolTip("Window created: " currentProcess)
+    If (currentProcess = "plover.exe") {
+      ; Plover launch
+      global HidePloverOnNextLaunch
+      If (HidePloverOnNextLaunch) {
+        HidePlover()
+        HidePloverOnNextLaunch := false
+      }
+    }
+  }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
     ; PlaceToolTip("Window activated: " currentProcess)
@@ -742,17 +754,17 @@ If (!WinExist("Plover ahk_class wxWindowNR")) {
 LaunchPlover() {
 If (!WinExist("Plover ahk_class wxWindowNR")) {
   ; PlaceToolTip("No Plover found; launching...", , 3000)
+  global HidePloverOnNextLaunch
+  HidePloverOnNextLaunch := true
   Run, ..\Plover\plover.exe
-  WinWait, Plover ahk_class wxWindowNR, , 25
-  SetTimer, HidePlover, -2000
 }
 }
 
-HidePlover:
+HidePlover() {
 If (WinExist("Plover ahk_class wxWindowNR")) {
   HideWindow("Plover ahk_class wxWindowNR")
 }
-return
+}
 
 UpdatePloverWindowStatus:
 UpdatePloverWindowStatus()
