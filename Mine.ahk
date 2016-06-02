@@ -232,7 +232,9 @@ return
 
 #IfWinActive ahk_class Chrome_WidgetWin_1
 :oc:chtr::
-:oc:htr::OneHomeTeaching()
+:oc:htr::
+OneHomeTeaching()
+return
 
 OneHomeTeaching(test = false) {
 Global HtArray
