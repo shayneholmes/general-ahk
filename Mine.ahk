@@ -525,6 +525,7 @@ if (SignOutStarted <> 1) {
   SetTimer,ResetSignOut,-1500
 } else {
   PlaceTooltip("Signing out...")
+  Sleep, 200
   SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
   Shutdown, 0
 }
