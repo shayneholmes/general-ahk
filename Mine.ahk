@@ -617,15 +617,15 @@ Return
 
 ; Timer
 #^t:: ; Set 2-minute timer
-StartTimer(2*60,, "4,192,64,255")
+StartTimer(2*60,, "e69124ff")
 return
 
 #+t:: ; Set 5-minute timer
-StartTimer(5*60,, "96,96,128,255")
+StartTimer(5*60,, "6d98a1fft")
 return
 
 #t:: ; Set 15-minute timer
-StartTimer(15*60,, "255,0,0,255", 1)
+StartTimer(15*60,, "c5472aff", 1)
 return
 
 StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCount = 0)
