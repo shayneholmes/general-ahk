@@ -187,6 +187,11 @@ return
 :b0:tt::
 return
 
+#IfWinActive Inkscape ; let Inkscape get F1, ctrl+alt+v
+~^!v::
+~F1::
+return
+
 #IfWinActive 
 
 /**
