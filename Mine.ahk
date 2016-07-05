@@ -889,7 +889,7 @@ MouseClickTurboToggle(autoclick = false) {
     SetTimer, MouseClickTurboClick, Off
   }
   If (MouseClickTurbo && autoclick) {
-    SetTimer, MouseClickTurboClick, 20
+    SetTimer, MouseClickTurboClick, 100
   }
   PlaceToolTip("Mouse click turbo mode " (MouseClickTurbo ? "on" : "off"), "Cursor")
 }
@@ -898,7 +898,7 @@ MouseClickTurboToggle(autoclick = false) {
 
 LButton::
 Click
-SetTimer, MouseClickTurboClick, 20
+SetTimer, MouseClickTurboClick, 100
 return
 
 LButton Up::
