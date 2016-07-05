@@ -247,7 +247,9 @@ Date := A_Now
 Date += -25, days
 FormatTime, Month, %Date%, MMMM
 ; Month := "July" ; optional override
-; SeasonalGreeting := "Happy New Year {!} " ; optional seasonal stuff
+If (Month == "June") {
+  SeasonalGreeting := "Happy Independence Day (almost){!} " ; optional seasonal stuff
+}
 If (HtArray == -1) { ; populate array on first use
   HtArray := Object()
   Loop, read, htnames.txt
