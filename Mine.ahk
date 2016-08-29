@@ -253,7 +253,12 @@ return
 #If WinActive("ahk_class TscShellContainerClass") and IsFullScreen()
 LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 #w::Send !{F4}
-LWin::Send !{Home}
+; LWin::Send !{Home}
+
+; RDCMan
+#If WinActive("Remote Desktop Connection Manager v")
+LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
+#w::Send !{F4}
 
 ; Chrome
 #IfWinActive ahk_class Chrome_WidgetWin_1
