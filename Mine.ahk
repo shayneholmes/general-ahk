@@ -526,8 +526,8 @@ return
 
 ; Raw paste
 ^!v::
-clipboard=%clipboard%
-sendraw %clipboard%
+clipboardastext=%clipboard%
+send {raw}%clipboardastext%
 return
 
 #+r:: ; Restore all windows
