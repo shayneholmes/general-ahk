@@ -320,12 +320,14 @@ return
 #IfWinActive .ini
 ^s::
 WinGetTitle, Title, A
-RegExMatch(Title, "(\w+)\.ini", SubPat)
+RegExMatch(Title, "((?:\w| )+)\\(?:\w| )+\.ini", SubPat)
 If (SubPat = "")
-  return
+{
+    return
+}
 PlaceTooltip("Reloading rainmeter skin " SubPat1 "...")
 send ^s ; save the script
-SendRainmeterCommand("[!Refresh " SubPat1 "]")
+SendRainmeterCommand("[!Refresh """ SubPat1 """]")
 return
 
 ; Product Studio
