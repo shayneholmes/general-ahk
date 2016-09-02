@@ -823,7 +823,7 @@ MouseClickTurboToggle(autoclick = false) {
   PlaceToolTip("Mouse click turbo mode " (MouseClickTurbo ? "on" : "off"), "Cursor")
 }
 
-#If MouseClickTurbo = true
+#If MouseClickTurbo
 
 LButton::
 Click
