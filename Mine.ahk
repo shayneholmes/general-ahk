@@ -51,9 +51,6 @@ LaunchOrHidePlover()
 
 SetTimer, UpdatePloverWindowStatus, 5000
 
-
-HtArray := -1
-
 ; Set up highlighter for screenshots
 Gui, ScreenshotSelection:New, -Caption +ToolWindow +LastFound
 Gui, ScreenshotSelection:Color, Yellow
