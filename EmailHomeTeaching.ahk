@@ -7,7 +7,7 @@ Greeting =
 (%
 Hey %Name%,
 
-%SeasonalGreeting%After changing home teaching assignments up, we still need to get reports back for last month: Which of your home teaching families did you visit in %Month%? As a reminder, your home teaching families last month were:
+%SeasonalGreeting%It's that time of the month again: Which of your home teaching families did you visit in %Month%? As a reminder, your home teaching families are:
 
 %Families%
 
@@ -29,15 +29,21 @@ InitializeVariables() {
 global
 ; Get config information from file
 local Params := Object()
+VariablesSet := false
 Loop, read, emailaccountinfo.tsv
 {
   Loop, Parse, A_LoopReadLine, %A_Tab%
   {
+    VariablesSet := true
     Params.Insert(A_LoopField)
   }
   FromAddress := Params[1]
   Username := Params[2]
   Password := Params[3]
+}
+if !(VariablesSet) {
+  MsgBox, No email account info found!`nPlace email account in emailaccountinfo.tsv.
+  ExitApp
 }
 }
 
