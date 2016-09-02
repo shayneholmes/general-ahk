@@ -47,8 +47,6 @@ AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
 AntimicroExists := FileExist(AntimicroPath)
 
 LaunchOrHidePlover()
-; UpdatePloverWindowStatus() 
-
 SetTimer, UpdatePloverWindowStatus, 5000
 
 ; Set up highlighter for screenshots
