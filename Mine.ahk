@@ -43,9 +43,6 @@ DllCall("ChangeWindowMessageFilterEx", Ptr,hWnd, Uint,16687, Uint,1, ptr,0) ; 16
 
 EnvGet, UserProfile, UserProfile
 
-AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
-AntimicroExists := FileExist(AntimicroPath)
-
 LaunchOrHidePlover()
 SetTimer, UpdatePloverWindowStatus, 5000
 
@@ -85,22 +82,6 @@ ShellMessage(wParam, lParam) {
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
     ; PlaceToolTip("Window activated: " currentProcess)
-
-    ; Update Antimicro for Outlook transitions
-    OutlookActive := (currentProcess = "outlook.exe")
-    UpdateAntimicro(OutlookActive)
-  }
-}
-
-UpdateAntimicro(outlookActive) {
-  global AntimicroPath, AntimicroExists
-  static AntimicroOutlookActive
-  if (outlookActive <> AntimicroOutlookActive) {
-    profileName := outlookActive ? "Outlook" : "Mouse"
-    if (AntimicroExists) {
-      Run, %AntimicroPath% --profile "C:\Users\shholmes\Dropbox\Apps\antimicro\profiles\%profileName%.gamecontroller.amgp"
-    }
-    AntimicroOutlookActive := outlookActive
   }
 }
 
