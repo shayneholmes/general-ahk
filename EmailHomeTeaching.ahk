@@ -26,9 +26,8 @@ UpdateUI()
 return
 
 InitializeVariables() {
-global
-; Get config information from file
 local Params := Object()
+; Get config information from file
 VariablesSet := false
 Loop, read, emailaccountinfo.tsv
 {
@@ -48,9 +47,8 @@ if !(VariablesSet) {
 }
 
 GenerateEmails() {
-global
-; Monthly items
 local Date := A_Now
+; Monthly items
 Date += -25, days
 FormatTime, Month, %Date%, MMMM
 ; Month := "July" ; optional override
