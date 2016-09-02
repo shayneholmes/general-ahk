@@ -41,11 +41,6 @@ OnMessage(16687, "RainmeterWindowMessage") ; 16687 = MESSAGE_RAINMETER
 ; allow message from non-elevated Rainmeter window
 DllCall("ChangeWindowMessageFilterEx", Ptr,hWnd, Uint,16687, Uint,1, ptr,0) ; 16687 = MESSAGE_RAINMETER, 1 = MSGFLT_ALLOW
 
-; Set up foot pedal commands
-AHKHID_UseConstants()
-OnMessage(0x00FF, "InputMsg") ; 0x00FF = WM_INPUT
-AHKHID_Register(12, 1, hWnd, 256) ; 256 = RIDEV_INPUTSINK ; other values determined empirically
-
 EnvGet, UserProfile, UserProfile
 
 AntimicroPath := "C:\Users\shholmes\Dropbox\Apps\antimicro\antimicro.exe"
@@ -858,45 +853,6 @@ PlaceTooltip("Screenshot copied and saved.")
 }
 
 ; Helper functions
-
-InputMsg(wParam, lParam) { ; Handle foot pedal events
-  Local r, h
-  Static footPedalLastState := 0
-  Static FootPedalButtons := [4, 2, 1]
-  Critical    ;Or otherwise you could get ERROR_INVALID_HANDLE
-  
-  ;Get device type
-  r := AHKHID_GetInputInfo(lParam, II_DEVTYPE) 
-  If (r = -1)
-    OutputDebug %ErrorLevel%
-  Else If (r = RIM_TYPEHID){
-    h := AHKHID_GetInputInfo(lParam, II_DEVHANDLE)
-    if (   AHKHID_GetDevInfo(h, DI_HID_VENDORID, True) = 1972
-      && AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,True) = 536) { ; is my foot pedal
-      r := AHKHID_GetInputData(lParam, uData)
-      if (r = 9) { ; it should always be 9 bytes back, just checking
-        footPedalState := (*(&uData+3))
-        for k, v in FootPedalButtons {
-          if (footPedalState & ~footPedalLastState & v) {
-            ; PlaceToolTip("Button " k " pressed.")
-            FootPedalButtonPressed(k)
-          }
-        }
-        footPedalLastState := footPedalState
-      }
-    }
-  }
-}
-
-FootPedalButtonPressed(k = 0) {
-  If (k = 1) { ; left button
-    SoundBeep, 600, 50
-  } Else if (k = 2) { ; center button
-    SoundBeep, 400, 50
-  } Else if (k = 3) { ; right button
-    SoundBeep, 800, 50
-  }
-}
 
 SetIconState(name = "timer", state = false) {
   global IconStateArray
