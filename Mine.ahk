@@ -598,14 +598,10 @@ CancelTimer(EventFromAHK = true) {
   }
   TimerActiveStart = 0
   SetIconState("timer", false)
-  If (!IsMusicPlaying())
-    BeepPcSpeakers()
 }
 
 TimerEnd:
 PlaceTooltip("Time's up!", , 3000)
-If (!IsMusicPlaying())
-  BeepPcSpeakers()
 SoundPlay, alarmsound.wav
 TimerActiveStart = 0
 SetIconState("timer", false)
@@ -800,12 +796,6 @@ y2 := currentY
 
 Gui, ScreenshotSelection:Show, % "NA X" x1 " Y" y1 " W" x2-x1 " H" y2-y1
 Gui, ScreenshotSelection:+LastFound
-}
-
-BeepPcSpeakers() {
-; SoundBeep 400, 40
-; SoundBeep 800, 40 
-; SoundBeep 400
 }
 
 +F13::MouseClickTurboToggle(true) ; shift Space invader key
