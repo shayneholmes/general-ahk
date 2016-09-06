@@ -170,21 +170,40 @@ return
  */
 ::nd:: ; legacy, was this before and I still type it all the time
 ::td::
-FormatTime, CurrentDateTime,, dddd, d MMMM yyyy
-SendInput %CurrentDateTime%
-SendRaw %A_EndChar%
+TypeNDaysAgo(0)
 return
 
 :b0?:/yd:: ; I bump into this when typing prices per yard of fabric ($25/yd)
 return
 
-::yd:: ; 1 day ago, for journaling
-today = %a_now%
-today += -1, days
+::yd:: ; yesterday's date, for journaling
+::1yd:: ; 1 day ago, for journaling
+TypeNDaysAgo(1)
+return
+
+::2yd::
+TypeNDaysAgo(2)
+return
+
+::3yd::
+TypeNDaysAgo(3)
+return
+
+::4yd::
+TypeNDaysAgo(4)
+return
+
+::5yd::
+TypeNDaysAgo(5)
+return
+
+TypeNDaysAgo(DaysAgo=0) {
+local today = %a_now%
+today += -%DaysAgo%, days
 FormatTime, today, %today%, dddd, d MMMM yyyy 
 SendInput %today%
 SendRaw %A_EndChar%
-return
+}
 
 ::ts:: ; 2013-03-22 (ISO standard, doncha know!)
 FormatTime, CurrentDateTime,, yyyy-MM-dd
