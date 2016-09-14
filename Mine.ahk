@@ -253,6 +253,7 @@ LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 ; Chrome
 #IfWinActive ahk_class Chrome_WidgetWin_1
 ^O::return
+^+w::return
 
 ; Skype for Business
 #IfWinActive ahk_class LyncConversationWindowClass
