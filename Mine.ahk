@@ -652,7 +652,7 @@ SetTimer,ReloadScript,-1000
 return
 
 ; Get rid of Win+Tab, replace it with the more helpful and conventional Alt+Tab
-LWin & Tab::AltTab
+; LWin & Tab::AltTab
 
 ; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
 ; RCtrl::LWin
