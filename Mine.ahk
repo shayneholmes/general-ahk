@@ -99,6 +99,8 @@ RainmeterWindowMessage(wParam, lParam) {
   }
 }
 
+; ---------------- End autoexecute section -----------------------
+
 ^/::
 ^?::
 HelpText =
