@@ -16,7 +16,6 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 SetTitleMatchMode 2 ; for #ifwinnotactive calls
 DetectHiddenWindows, on
-IconStateArray := {timer: false, plover: false} ; set precedence for icons
 SetIconState()
 
 #Include lib
@@ -667,7 +666,7 @@ return
 
 SetErgodoxConnected()
 {
-  global ErgodoxState
+  static ErgodoxState := false
   If (ErgodoxState <> true) {
     ; PlaceTooltip("Noticed Ergodox. Setting keys right." ErgodoxState)
     ErgodoxState := true
@@ -761,7 +760,7 @@ return
 DrawRectangle(startNewRectangle := false) {
 static lastX, lastY
 static xorigin, yorigin
-global x1, y1, x2, y2
+static x1, y1, x2, y2
 
 if (startNewRectangle) {
   MouseGetPos, xorigin, yorigin
@@ -861,7 +860,7 @@ SwitchVirtualDesktop()
 }
 
 SetIconState(name = "timer", state = false) {
-  global IconStateArray
+  static IconStateArray := {timer: false, plover: false} ; set precedence for icons
   IconStateArray[name] := state
   for key, value in IconStateArray {
     if (value) {
