@@ -626,6 +626,9 @@ F16::Send α
 F17::Send ∞
 ^+8::
 +NumpadMult::Send ×
+F21::
+SwitchVirtualDesktop()
+return
 
 F24::ChangePloverStatus(true)
 
@@ -841,6 +844,21 @@ PlaceTooltip("Screenshot copied and saved.")
 }
 
 ; Helper functions
+
+SwitchVirtualDesktop()
+{
+  static switchedDesktop := false
+  if switchedDesktop
+  {
+    SendEvent ^#{Right}
+    switchedDesktop := false
+  }
+  else
+  {
+    SendEvent ^#{Left}
+    switchedDesktop := true
+  }
+}
 
 SetIconState(name = "timer", state = false) {
   global IconStateArray
