@@ -425,12 +425,6 @@ Sleep, 200
 SendMessage,0x112,0xF170,2,,Program Manager ; turn off monitor
 }
 
-#u::
-goto mwt_UnMinimize
-
-#h::
-goto mwt_Minimize
-
 ; Sign out (hit it twice)
 #+o::
 if (SignOutStarted <> 1) {
@@ -449,10 +443,10 @@ ResetSignOut:
 SignOutStarted = 0
 return
 
-#IfWinActive
-
 ; Window commands
 
+#h::goto mwt_Minimize ; Window hide
+#u::goto mwt_UnMinimize ; Window unhide
 #w::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
 #q::Send !{F4}
 #n::WinMinimize, A
