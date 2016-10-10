@@ -40,8 +40,6 @@ OnMessage(16687, "RainmeterWindowMessage") ; 16687 = MESSAGE_RAINMETER
 ; allow message from non-elevated Rainmeter window
 DllCall("ChangeWindowMessageFilterEx", Ptr,hWnd, Uint,16687, Uint,1, ptr,0) ; 16687 = MESSAGE_RAINMETER, 1 = MSGFLT_ALLOW
 
-EnvGet, UserProfile, UserProfile
-
 LaunchOrHidePlover()
 SetTimer, UpdatePloverWindowStatus, 5000
 
@@ -727,7 +725,10 @@ return
 
 RCtrl & RButton::
 TakeScreenshot() {
-global UserProfile
+static UserProfile
+if (UserProfile = "") {
+  EnvGet, UserProfile, UserProfile
+}
 CoordMode, Mouse, Screen
 MouseGetPos, begin_x, begin_y
 DrawRectangle(true)
