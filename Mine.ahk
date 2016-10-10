@@ -276,7 +276,6 @@ $F7::Send ^+2
 #IfWinActive FamilySearch Indexing
 Space::Tab
 Tab::Space
-#IfWinActive
 
 ; Windows Explorer
 #IfWinActive ahk_class CabinetWClass
