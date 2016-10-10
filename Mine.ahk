@@ -129,7 +129,7 @@ Ctrl+Alt+B: Hide window border
 Ctrl+Alt+H: Hide window from taskbar
 Win+Shift+R: Restore all windows
 Win+H: Hide current window
-Win+U: Unhide window
+Shift+Win+H: Unhide window
 Win+W: Close current window
 Win+N: Minimize current window
 
@@ -397,7 +397,7 @@ LWin::Send ^!+#w
 
 ; Disable generally annoying hotkeys
 #IfWinActive
-; #u::return ; disable narrator (turned off because I've included explicit #u below for unhide)
+#u::return ; disable narrator
 #Enter::return ; other narrator
 #F16::return ; can't believe this is a problem, but disable shutdown swipe
 
@@ -446,7 +446,7 @@ return
 ; Window commands
 
 #h::goto mwt_Minimize ; Window hide
-#u::goto mwt_UnMinimize ; Window unhide
++#h::goto mwt_UnMinimize ; Window unhide
 #w::PostMessage, 0x112, 0xF060,,, A, ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
 #q::Send !{F4}
 #n::WinMinimize, A
