@@ -737,8 +737,8 @@ SetTimer, rectangle, Off
 Gui, ScreenshotSelection:Cancel
 MouseGetPos, end_x, end_y
 
-Capture_x := (end_x < begin_x) ? end_x : begin_x
-Capture_y := (end_y < begin_y) ? end_y : begin_y
+Capture_x := Min(end_x, begin_x)
+Capture_y := Min(end_y, begin_y)
 Capture_width := Abs(end_x - begin_x)
 Capture_height := Abs(end_y - begin_y)
 
@@ -759,7 +759,6 @@ return
 DrawRectangle(startNewRectangle := false) {
 static lastX, lastY
 static xorigin, yorigin
-static x1, y1, x2, y2
 
 if (startNewRectangle) {
   MouseGetPos, xorigin, yorigin
@@ -775,25 +774,12 @@ return
 lastX := currentX
 lastY := currentY
 
-; Allow dragging to the left of the click point.
-if (currentX < xorigin) {
-x1 := currentX
-x2 := xorigin
-} else {
-x1 := xorigin
-x2 := currentX
-}
+x := Min(currentX, xorigin)
+w := Abs(currentX - xorigin)
+y := Min(currentY, yorigin)
+h := Abs(currentY - yorigin)
 
-; Allow dragging above the click point.
-if (currentY < yorigin) {
-y1 := currentY
-y2 := yorigin
-} else {
-y1 := yorigin
-y2 := currentY
-}
-
-Gui, ScreenshotSelection:Show, % "NA X" x1 " Y" y1 " W" x2-x1 " H" y2-y1
+Gui, ScreenshotSelection:Show, % "NA X" x " Y" y " W" w " H" h
 Gui, ScreenshotSelection:+LastFound
 }
 
@@ -949,3 +935,12 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetWindowClass)  ; ByRef saves a l
     SendMessage, 0x4a, 0, &CopyDataStruct,, ahk_class %TargetWindowClass%  ; 0x4a is WM_COPYDATA. Must use Send not Post.
     return ErrorLevel  ; Return SendMessage's reply back to our caller.
 }
+
+Min(x, y) {
+  return x < y ? x : y
+}
+
+Max(x, y) {
+  return x > y ? x : y
+}
+
