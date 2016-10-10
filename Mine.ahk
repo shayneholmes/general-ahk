@@ -267,11 +267,6 @@ LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 #IfWinActive ahk_class Notepad
 ^Backspace::Send +^{Left}{Backspace}
 
-; Outlook
-#IfWinActive ahk_class rctrl_renwnd32
-$F6::Send ^+1 ; One-key archive
-$F7::Send ^+2
-
 ; FamilySearch
 #IfWinActive FamilySearch Indexing
 Space::Tab
