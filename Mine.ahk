@@ -311,10 +311,10 @@ Reload
 return
 
 ; Save and reload rainmeter if currently editing
-#IfWinActive .ini
+#IfWinActive Notepad++
 ^s::
 WinGetTitle, Title, A
-RegExMatch(Title, "((?:\w| )+)\\(?:\w| )+\.ini", SubPat)
+RegExMatch(Title, "\\Skins\\((?:\w| )+)\\", SubPat)
 If (SubPat = "")
 {
     return
