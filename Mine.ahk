@@ -256,8 +256,8 @@ LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 
 ; Chrome
 #IfWinActive ahk_class Chrome_WidgetWin_1
-^O::return
-^+w::return
+^O::return ; why would I want to open something with ctrl+o?
+^+w::return ; closing all tabs is not my idea of fun
 
 ; Skype for Business
 #IfWinActive ahk_class LyncConversationWindowClass
