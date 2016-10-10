@@ -609,9 +609,9 @@ return
 CheckMusicBeePlayCount() {
   PlayCount := MB_GetFileProperty(MBFP_PlayCount)
   ; PlaceToolTip("PlayCount: " PlayCount)
-  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " PlayCount "][!UpdateMeasure mPlayCount NowPlaying]")
+  SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " PlayCount " NowPlaying][!UpdateMeasure mPlayCount NowPlaying]")
   SkipCount := MB_GetFileProperty(MBFP_SkipCount)
-  SendRainmeterCommand("[!SetVariable NowPlayingSkipCount " SkipCount "][!UpdateMeasure mSkipCount NowPlaying]")
+  SendRainmeterCommand("[!SetVariable NowPlayingSkipCount " SkipCount " NowPlaying][!UpdateMeasure mSkipCount NowPlaying]")
 }
 
 ; Ergodox special keys
