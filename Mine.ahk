@@ -51,6 +51,11 @@ WinSet, Transparent, 100
 CheckRainmeterTooltipHeartbeat()
 SetTimer, CheckRainmeterTooltipHeartbeat, 300000 ; 5 minutes
 
+; work computer defaults
+if (A_ComputerName = "SHHOLDER") {
+  SetErgodoxConnected()
+}
+
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
 ;    WinGet, currentProcess, ProcessName, ahk_id %lParam%
