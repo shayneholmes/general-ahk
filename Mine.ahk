@@ -591,7 +591,6 @@ return
 
 CheckMusicBeePlayCount() {
   PlayCount := MB_GetFileProperty(MBFP_PlayCount)
-  ; PlaceToolTip("PlayCount: " PlayCount)
   SendRainmeterCommand("[!SetVariable NowPlayingPlayCount " PlayCount " NowPlaying][!UpdateMeasure mPlayCount NowPlaying]")
   SkipCount := MB_GetFileProperty(MBFP_SkipCount)
   SendRainmeterCommand("[!SetVariable NowPlayingSkipCount " SkipCount " NowPlaying][!UpdateMeasure mSkipCount NowPlaying]")
@@ -610,6 +609,7 @@ F16::Send α
 F17::Send ∞
 ^+8::
 +NumpadMult::Send ×
+
 F21::
 SwitchVirtualDesktop()
 return
@@ -627,7 +627,8 @@ ChangePloverStatus(state) {
   UpdatePloverWindowStatus()
 }
 
-+F24:: ;plover re-start
+; Plover restart
++F24::
 +F23::
 If (WinExist("Plover ahk_class wxWindowNR")) {
   WinClose,,,5
@@ -635,25 +636,16 @@ If (WinExist("Plover ahk_class wxWindowNR")) {
 LaunchPlover()
 return
 
-#^r:: ; Reload
+; Reload script
+#^r::
 PlaceTooltip("Reloading script...")
 SetTimer,ReloadScript,-1000
 return
-
-; Get rid of Win+Tab, replace it with the more helpful and conventional Alt+Tab
-; LWin & Tab::AltTab
-
-; Model M stuff (I've remapped the LAlt to a LWin, and RAlt to LAlt)
-; RCtrl::LWin
-; ScrollLock::LWin
-; LCtrl & LWin::Send {Alt Down}
-; LCtrl & LWin Up::Send {Alt Up}
 
 SetErgodoxConnected()
 {
   static ErgodoxState := false
   If (ErgodoxState <> true) {
-    ; PlaceTooltip("Noticed Ergodox. Setting keys right." ErgodoxState)
     ErgodoxState := true
     Hotkey, If, WinExist("MusicBee") && (MB_GetPlayState() != MBPS_Stopped)
     Hotkey, F12, Off
@@ -702,7 +694,6 @@ UpdatePloverWindowStatus() {
     SendRainmeterCommand("[!SetVariable IndicatorState " PloverCurrentStatus "][!Update PloverStatus]")
     SetIconState("plover", (PloverCurrentStatus = -1 ? "Plover input enabled" : false))
     PloverLastStatus := PloverCurrentStatus
-    ; PlaceTooltip("Plover status: " PloverCurrentStatus)
   }
 }
 
