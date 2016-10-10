@@ -324,12 +324,6 @@ send ^s ; save the script
 SendRainmeterCommand("[!Refresh """ SubPat1 """]")
 return
 
-; Product Studio
-#IfWinActive ahk_class PSWnd
-^Backspace::Send +^{Left}{Backspace}
-^Enter::Send {F5}
-^w::Send ^{F4}
-
 ; ctrl+v paste in cmd prompt
 #IfWinActive ahk_class ConsoleWindowClass
 ^V::SendInput {Raw}%clipboard%
