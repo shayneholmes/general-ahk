@@ -251,7 +251,7 @@ LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 
 ; RDCMan
 #If WinActive("Remote Desktop Connection Manager v")
-LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
+;LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 #w::Send !{F4}
 
 ; Chrome
@@ -811,16 +811,16 @@ PlaceTooltip("Screenshot copied and saved.")
 
 SwitchVirtualDesktop()
 {
-  static switchedDesktop := false
-  if switchedDesktop
+  static onLeftDesktop := true
+  if onLeftDesktop
   {
     SendEvent ^#{Right}
-    switchedDesktop := false
+    onLeftDesktop := false
   }
   else
   {
     SendEvent ^#{Left}
-    switchedDesktop := true
+    onLeftDesktop := true
   }
 }
 
