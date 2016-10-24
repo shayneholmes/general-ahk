@@ -342,6 +342,8 @@ $F10::ControlSend,,{PgUp},ahk_class MediaPlayerClassicW
 Pause & ScrollLock::Send {Media_Next}
 Pause & PrintScreen::Send {Media_Prev}
 
++Media_Play_Pause::MB_Stop()
+
 Media_Play_Pause::
 SetErgodoxConnected()
 F12::
