@@ -652,6 +652,7 @@ SetErgodoxConnected()
     Hotkey, If, WinExist("MusicBee") && (MB_GetPlayState() != MBPS_Stopped)
     Hotkey, F12, Off
     Hotkey, F11, Off
+    Hotkey, +F11, Off
     Hotkey, F10, Off
     ; If Ergodox, we're probably using the USB DAC; no volume control necessary
     Hotkey, ^!Up, Off
