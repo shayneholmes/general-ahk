@@ -700,7 +700,10 @@ UpdatePloverWindowStatus() {
 }
 
 #c::
-TrayTip, , Hi!
+Send ^c
+clipboardastext:=clipboard
+SendRainmeterCommand(clipboardastext . "[!Log CommandSent]")
+
 return
 
 RCtrl & RButton::
