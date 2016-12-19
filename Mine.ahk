@@ -56,6 +56,8 @@ if (A_ComputerName = "SHHOLDER") {
   SetErgodoxConnected()
 }
 
+InitializeDeadKeys()
+
 ShellMessage(wParam, lParam) {
 ; Execute a command based on wParam and lParam
 ;    WinGet, currentProcess, ProcessName, ahk_id %lParam%
@@ -223,6 +225,68 @@ FormatTime, CurrentDateTime,, yyyy-MM-ddTHH-mm
 SendInput %CurrentDateTime%
 SendRaw %A_EndChar%
 return
+
+; Deadkeys
+
+Nothing:
+PlaceToolTip("Nothing")
+return
+
+ApplyDeadkey(modifier, key) {
+  static ApplyDeadkey := {"'": {a: "á"
+                               ,e: "é"
+                               ,i: "í"
+                               ,o: "ó"
+                               ,u: "ú"
+                               ,"'": "'"
+                               ,"!": "'"
+                               ,n: "ñ"}
+                         ,"~": {n: "ñ"}
+                         ,"""":{u: "ü"} }
+  output := ApplyDeadkey[modifier][key]
+  if key is upper
+    output := Format("{1:Us}", output)
+  return output ? output : modifier . key
+}
+
+GetDeadKey(modifier) {
+  PlaceToolTip("Dead key pressed; waiting...")
+  Input, key, L1 , {delete}{esc}{home}{end}
+  output := ApplyDeadkey(modifier, key)
+  SendRaw %output%
+}
+
+DeadKeysSetHotkeys(deadkeysenabled) {
+  static hotkeysToToggle := ["$'", "$~", "$+'"]
+  deadkeysState := deadkeysenabled ? "On" : "Off"
+  deadkeysFunc = func("GetDeadKey")
+  Hotkey, IfWinActive
+  for index, key in hotkeysToToggle {
+    Hotkey, %key%, %deadkeysState%
+  }
+}
+
+InitializeDeadKeys() {
+  DeadKeysSetHotkeys(false)
+}
+
+ToggleDeadKeys() {
+  static deadKeysEnabled = false
+  deadKeysEnabled := not(deadKeysEnabled)
+  DeadKeysSetHotkeys(deadKeysEnabled)
+  PlaceToolTip("Dead keys " . (deadKeysEnabled ? "enabled" : "disabled"))
+}
+
+#+d:: ; Toggle deadkeys
+ToggleDeadKeys()
+return
+
+$'::GetDeadKey("'")
+$+'::GetDeadKey("""")
+$~::GetDeadKey("~")
+
+^'::GetDeadKey("'")
+^+'::GetDeadKey("""")
 
 ; App-specific hotkeys
 
