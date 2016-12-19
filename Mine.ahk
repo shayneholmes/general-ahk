@@ -91,6 +91,8 @@ RainmeterWindowMessage(wParam, lParam) {
   global RainmeterTooltipActive
   If (wParam = 0) { ; timer start
     StartTimer(lParam, false)
+  } Else If (wParam = 4) { ; timer start (time of day)
+    StartTimer(lParam, false,,, 1)
   } Else If (wParam = 1) { ; timer end
     CancelTimer(false)
   } Else If (wParam = 2) { ; track change
@@ -538,7 +540,7 @@ return
 StartTimer(15*60,, "c5472aff", 1)
 return
 
-StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCount = 0)
+StartTimer(Duration, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCount = 0, TimeOfDay = 0)
 {
   global TimerActiveStart
   
@@ -548,18 +550,22 @@ StartTimer(Seconds, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCoun
   }
 
   TimerActiveStart := A_TickCount
+  
+  If (TimeOfDay == 1) {
+    EnvAdd, T, Duration, Seconds
+    FormatTime PrettyTime, %T%, hh:mm
+  } Else If (mod(Duration,60) == 0) {
+    PrettyTime := Seconds // 60 " minutes"
+  } Else {
+    T = 20000101000000
+    T += Duration, Seconds
+    FormatTime PrettyTime, %T%, mm:ss
+  }
+  PlaceTooltip("Timer set for " PrettyTime ".")
   If (EventFromAHK) {
-    If (mod(Seconds,60) = 0) {
-      PrettyTime := Seconds // 60 " minutes"
-    } Else {
-      T = 20000101000000
-      T += Seconds, Seconds
-      FormatTime PrettyTime, %T%, mm:ss
-    }
-    PlaceTooltip("Timer set for " PrettyTime ".")
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Seconds / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
-    delay := -1000*(Seconds)
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Duration / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
+    delay := -1000*(Duration)
     SetTimer, TimerEnd, %delay%
   } else { ; Rainmeter started a new timer: cancel any existing AHK timer
     SetTimer, TimerEnd, off
