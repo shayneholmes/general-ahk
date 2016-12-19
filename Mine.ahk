@@ -326,7 +326,7 @@ LAlt & Tab::Send {Blind}{PgUp} ; {blind} keeps the alt key down
 ^+w::return ; closing all tabs is not my idea of fun
 
 ; Skype for Business
-#IfWinActive ahk_class LyncConversationWindowClass
+#IfWinActive ahk_exe lync.exe
 ^Enter::Send {Enter} ; Instead of starting video chat
 
 ; Notepad
