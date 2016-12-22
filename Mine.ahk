@@ -634,6 +634,8 @@ StartTimer(Duration, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCou
   } else { ; Rainmeter started a new timer: cancel any existing AHK timer
     SetTimer, TimerEnd, off
   }
+  BlinkColor := SubStr(Color, 1, -2)
+  Run, blink-tool.exe --rgb %BlinkColor%, , Hide
   SetIconState("timer", "Timer set for " PrettyTime)
 }
 
@@ -649,7 +651,11 @@ CancelTimer(EventFromAHK = true) {
     FormatTime FormdT, %T%, mm:ss
     PlaceTooltip("Timer canceled after " FormdT)
     SetTimer, TimerEnd, off
+    Run, blink-tool.exe --off, , Hide
+  } else {
+    Run, blink-tool.exe --blink 5, , Hide
   }
+  
   TimerActiveStart = 0
   SetIconState("timer", false)
 }
@@ -658,6 +664,7 @@ TimerEnd:
 PlaceTooltip("Time's up!", , 3000)
 SoundPlay, alarmsound.wav
 TimerActiveStart = 0
+Run, blink-tool.exe --off, , Hide
 SetIconState("timer", false)
 return
 
