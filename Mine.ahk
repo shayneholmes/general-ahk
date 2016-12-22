@@ -378,6 +378,7 @@ WinGetTitle, Title, A
 RegExMatch(Title, "\\Skins\\((?:\w| )+)\\", SubPat)
 If (SubPat = "")
 {
+    send ^s ; save the file!
     return
 }
 PlaceTooltip("Reloading rainmeter skin " SubPat1 "...")
@@ -653,7 +654,7 @@ CancelTimer(EventFromAHK = true) {
     SetTimer, TimerEnd, off
     Run, blink-tool.exe --off, , Hide
   } else {
-    Run, blink-tool.exe --blink 5, , Hide
+    Run, blink-tool.exe --rgb ffffff --glimmer=5, , Hide
   }
   
   TimerActiveStart = 0
