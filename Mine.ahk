@@ -20,9 +20,11 @@ SetIconState()
 
 #Include lib
 #include Gdip.ahk
+#Include blink\blink.ahk
 #Include minimizetray.ahk
 #Include MusicBeeIPC ; the path to the MusicBeeIPC SDK
 #Include MusicBeeIPC.ahk
+
 
 #Persistent
 SetBatchLines, -1
@@ -779,10 +781,11 @@ UpdatePloverWindowStatus() {
 }
 
 #c::
-Send ^c
-clipboardastext:=clipboard
-SendRainmeterCommand(clipboardastext . "[!Log CommandSent]")
-
+device := blink1_open()
+out := blink1_getVersion(device)
+; out := blink1_enumerate()
+PlaceToolTip("Out=" . out . " Device=" . device . " Error=" . ErrorLevel . "")
+blink1_close(device)
 return
 
 RCtrl & RButton::
