@@ -597,7 +597,7 @@ StartTimer(2*60,, "e69124ff")
 return
 
 #+t:: ; Set 5-minute timer
-StartTimer(5*60,, "6d98a1fft")
+StartTimer(5*60,, "6d98a1ff")
 return
 
 #t:: ; Set 15-minute timer
@@ -619,7 +619,7 @@ StartTimer(Duration, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCou
     EnvAdd, T, Duration, Seconds
     FormatTime PrettyTime, %T%, hh:mm
   } Else If (mod(Duration,60) == 0) {
-    PrettyTime := Seconds // 60 " minutes"
+    PrettyTime := Duration // 60 " minutes"
   } Else {
     T = 20000101000000
     T += Duration, Seconds
@@ -628,7 +628,7 @@ StartTimer(Duration, EventFromAHK = true, ByRef Color = "4,192,64,255", TimerCou
   PlaceTooltip("Timer set for " PrettyTime ".")
   If (EventFromAHK) {
     SoundPlay, alarmstart.wav
-    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Duration / 60 "','" Color "'," TimerCount ")"" MinimalTimer")
+    SendRainmeterCommand("!CommandMeasure MeasureTimerScript ""StartTimerAPI('" Duration "','" Color "'," TimerCount ")"" MinimalTimer")
     delay := -1000*(Duration)
     SetTimer, TimerEnd, %delay%
   } else { ; Rainmeter started a new timer: cancel any existing AHK timer
