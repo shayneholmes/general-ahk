@@ -82,10 +82,30 @@ ShellMessage(wParam, lParam) {
         HidePloverOnNextLaunch := false
       }
     }
+    If (currentProcess = "mstsc.exe") {
+      ; If (WinExist("Visual Studio ahk_exe mstsc.exe ahk_id " . lParam) > 0) {
+        ; WinGet, oldStyle, Style
+        ; If (oldStyle && ((oldStyle & 0xC40000) != 0xC00000))   {
+          ; WinSet, Style, +0xC00000 ; 0xC00000 = WS_CAPTION
+          ; WinSet, Style, -0x40000 ; 0x40000 = WS_SIZEBOX
+          ; PlaceToolTip("Set VS window style appropriately")
+        ; }
+      ; }
+    }
   }
   If (wParam = 4 OR wParam = 32772) { ; HSHELL_WINDOWACTIVATED or HSHELL_RUDEAPPACTIVATED
     WinGet, currentProcess, ProcessName, ahk_id %lParam%
     ; PlaceToolTip("Window activated: " currentProcess)
+    If (currentProcess = "mstsc.exe") {
+      ; If (WinExist("Visual Studio ahk_exe mstsc.exe ahk_id " . lParam) > 0) {
+        ; WinGet, oldStyle, Style
+        ; If (oldStyle && ((oldStyle & 0xC40000) != 0xC00000)) {
+          ; WinSet, Style, +0xC00000 ; 0xC00000 = WS_CAPTION
+          ; WinSet, Style, -0x40000 ; 0x40000 = WS_SizeBoxes 
+          ; PlaceToolTip("Set VS window style appropriately")
+        ; }
+      ; }
+    }
   }
 }
 
@@ -459,7 +479,10 @@ LWin & =:: ; used to make LWin a Prefix key; see http://www.autohotkey.com/docs/
 LWin::Send !{F10}
 
 #IfWinExist ahk_exe Executor.exe
-LWin::Send ^!+#w
+LWin::Send !#z
+
+#IfWinExist ahk_exe keypirinha.exe
+LWin::Send ^#k
 
 #IfWinExist ahk_exe Wox.exe
 LWin::Send ^!+#w
@@ -565,9 +588,10 @@ WinShow, A
 return
 
 ^!c::
+hwnd := WinExist("A")
 WinGet, ExStyle, ExStyle, A
 WinGet, Style, Style, A
-PlaceTooltip("Window style: " ExStyle ", " Style)
+PlaceTooltip("Window id: " . hwnd . " style: " Style ", ExStyle: " ExStyle)
 return 
 
 ; Raw paste
